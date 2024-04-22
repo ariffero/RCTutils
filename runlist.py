@@ -1,7 +1,13 @@
 import json
 import gspread
 import datetime
+import argparse
+
 from oauth2client.service_account import ServiceAccountCredentials
+
+parser = argparse.ArgumentParser(description='Process ALICE Run3 runlist.')
+parser.add_argument('config_file', type=str, help='Configuration file path')
+args = parser.parse_args()
 
 def read_config(file_path):
     with open(file_path, 'r') as file:
@@ -20,18 +26,17 @@ def check_run_quality(run_row, detector_indices, qualities, current_period, peri
             return False, period
     return True, period
 
-config = read_config('config.json')
+config = read_config(args.config_file)
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 credentials = ServiceAccountCredentials.from_json_keyfile_name('runlist-5dfcf12a816d.json', scope)
 client = gspread.authorize(credentials)
 
 current_date = datetime.datetime.now().strftime("%Y-%m-%d")
-
 for sheet_config in config['sheets']:
-    spreadsheet = client.open("QC_summary_data_2023_pbpb")
+    spreadsheet = client.open(sheet_config.get('sheet_name'))
     allowed_periods = sheet_config.get('periods', None)
-    worksheet = spreadsheet.worksheet(sheet_config['name']) 
-    pass_id = int(sheet_config.get('pass_shift', 1)) 
+    worksheet = spreadsheet.worksheet(sheet_config['tab_name'])
+    pass_id = int(sheet_config.get('pass_shift', 1))
     for runlist_config in sheet_config['runlists']:
         header_row_period = worksheet.row_values(1)
         header_row = worksheet.row_values(2)
@@ -47,9 +52,14 @@ for sheet_config in config['sheets']:
             is_good_run, current_period = check_run_quality(row, detector_indices, runlist_config['detectors'], current_period, period_column_index, allowed_periods)
             if is_good_run:
                 runlist.append(row[3])
-                unique_periods.add(current_period) 
+                unique_periods.add(current_period)
 
-        with open(f'{runlist_config["name"]}_{current_period}.txt', 'w') as file:
+        if allowed_periods:
+            file_name_suffix = '_'.join(allowed_periods)
+        else:
+            file_name_suffix = sheet_config['tab_name'].replace('/', '_')
+            
+        with open(f'{runlist_config["name"]}_{file_name_suffix}.txt', 'w') as file:
             file.write(f'# Creation Date: {current_date}, Periods: {", ".join(unique_periods)}\n')
             file.write(','.join(runlist))
 

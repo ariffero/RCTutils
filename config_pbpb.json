@@ -1,0 +1,21 @@
+{
+    "sheets": [
+        {
+            "sheet_name": "QC_summary_data_2023_pbpb",          
+            "tab_name": "PbPb_LHC23zzf/zzg/zzh/zzi",
+            "pass_shift": "1",
+            "periods": [],
+            "runlists": [
+                {
+                    "name": "runlist_its_tpc_ft0_pp",
+                    "detectors": {
+                        "ITS": ["Good", "Limited_acceptance (MC reproducible)"],
+                        "TPC": ["Good"],
+                        "FT0": ["Good", "Limited_acceptance"]
+                    }
+                }
+            ]
+        }
+    ]
+}
+
