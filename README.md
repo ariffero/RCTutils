@@ -6,5 +6,6 @@
   - runlists name: the dumped file name. detectors: add the requested detectors and the flags.
   - pass_shift: select which apass to be checked. For example, "1" refers to the first apass for a detector.
   - pass_name: set the apass name which will be in the dumped file.
+  - runlists -> name: indicating which run list it is, e.g., CBT, CBT_hadronPID
 - Make sure you have the certificate runlist-5dfcf12a816d.json under the same folder where you run the script. Contact Jian Liu (jian.liu@cern.ch) for the certificate.
 - `python3 runlist.py config_pp.json`

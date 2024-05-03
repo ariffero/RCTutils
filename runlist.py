@@ -65,7 +65,7 @@ for sheet_config in config['sheets']:
             unique_periods = default_periods
             file_name_suffix = sheet_config['tab_name'].replace('/', '_')
             
-        with open(f'{runlist_config["name"]}_{pass_name}_{file_name_suffix}.txt', 'w') as file:
+        with open(f'Runlist_{file_name_suffix}_{pass_name}_{runlist_config["name"]}_{current_date}.txt', 'w') as file:
             file.write(f'# Creation Date: {current_date}, Pass: {pass_name}, Periods: {", ".join(unique_periods)}\n')
             file.write(','.join(runlist))
 
