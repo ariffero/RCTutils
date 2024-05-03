@@ -23,7 +23,9 @@ def check_run_quality(run_row, detector_indices, qualities, current_period, peri
 
     for detector, quality_flags in qualities.items():
         if run_row[detector_indices[detector]-1].strip() not in quality_flags:
+            #print(detector,run_row[detector_indices[detector]-1].strip())
             return False, period
+        #print(detector,run_row[detector_indices[detector]-1].strip())
     return True, period
 
 config = read_config(args.config_file)
@@ -37,10 +39,12 @@ for sheet_config in config['sheets']:
     allowed_periods = sheet_config.get('periods', None)
     worksheet = spreadsheet.worksheet(sheet_config['tab_name'])
     pass_id = int(sheet_config.get('pass_shift', 1))
+    pass_name = sheet_config.get('pass_name', None)
     for runlist_config in sheet_config['runlists']:
         header_row_period = worksheet.row_values(1)
         header_row = worksheet.row_values(2)
         unique_periods = set()
+        default_periods = set()
 
         period_column_index = header_row_period.index('Period')
         detector_indices = {detector: get_detector_column_index(detector, header_row, pass_id) for detector in runlist_config['detectors'].keys()}
@@ -50,17 +54,19 @@ for sheet_config in config['sheets']:
 
         for row in rows[3:]:
             is_good_run, current_period = check_run_quality(row, detector_indices, runlist_config['detectors'], current_period, period_column_index, allowed_periods)
+            default_periods.add(current_period)
             if is_good_run:
                 runlist.append(row[3])
-                unique_periods.add(current_period)
 
         if allowed_periods:
+            unique_periods = allowed_periods
             file_name_suffix = '_'.join(allowed_periods)
         else:
+            unique_periods = default_periods
             file_name_suffix = sheet_config['tab_name'].replace('/', '_')
             
         with open(f'{runlist_config["name"]}_{file_name_suffix}.txt', 'w') as file:
-            file.write(f'# Creation Date: {current_date}, Periods: {", ".join(unique_periods)}\n')
+            file.write(f'# Creation Date: {current_date}, Pass: {pass_name}, Periods: {", ".join(unique_periods)}\n')
             file.write(','.join(runlist))
 
         print(f'Runlist {runlist_config["name"]} has been generated with {len(runlist)} runs.')
