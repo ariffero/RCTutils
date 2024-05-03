@@ -3,15 +3,18 @@
         {
             "sheet_name": "QC_summary_data_2023_pbpb",          
             "tab_name": "PbPb_LHC23zzf/zzg/zzh/zzi",
-            "pass_shift": "1",
-            "periods": [],
+            "pass_shift": "3",
+            "pass_name": "apass3",
+            "periods": ["LHC23zzh"],
             "runlists": [
                 {
-                    "name": "runlist_its_tpc_ft0_pp",
+                    "name": "runlist_its_tpc_ft0_PbPb",
                     "detectors": {
-                        "ITS": ["Good", "Limited_acceptance (MC reproducible)"],
+                        "ITS": ["Good"],
                         "TPC": ["Good"],
-                        "FT0": ["Good", "Limited_acceptance"]
+                        "FT0": ["Good"],
+			"TOF": ["Good"],
+			"TRD": ["Good"]
                     }
                 }
             ]

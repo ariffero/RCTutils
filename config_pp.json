@@ -4,6 +4,7 @@
             "sheet_name": "QC_summary_data_2023",          
             "tab_name": "LHC23i/j/k/l/m",
             "pass_shift": "1",
+            "pass_name": "apass3",
             "periods": [],
             "runlists": [
                 {
