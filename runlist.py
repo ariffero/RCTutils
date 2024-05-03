@@ -14,7 +14,7 @@ def read_config(file_path):
         return json.load(file)
 
 def get_detector_column_index(detector, header_row, pass_id):
-    return header_row.index(detector) + pass_id
+    return header_row.index(detector) + pass_id + 1
 
 def check_run_quality(run_row, detector_indices, qualities, current_period, period_column_index, allowed_periods):
     period = run_row[period_column_index].strip() or current_period
