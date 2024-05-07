@@ -1,0 +1,23 @@
+{
+    "sheets": [
+        {
+            "sheet_name": "QC_summary_data_2022",          
+            "tab_name": "apass3_QC",
+            "pass_shift": "0",
+            "pass_name": "apass3",
+            "periods": ["LHC22m"],
+            "separate_22o_test": "False",
+            "runlists": [
+                {
+                    "name": "CBT",
+                    "detectors": {
+                        "ITS": ["Good", "Limited_acceptance (MC reproducible)"],
+                        "TPC": ["Good"],
+                        "FT0": ["Good", "Limited_acceptance"]
+                    }
+                }
+            ]
+        }
+    ]
+}
+
