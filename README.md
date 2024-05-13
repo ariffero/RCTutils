@@ -14,10 +14,10 @@
 
 # How to export runs from RCT (in Bookkeeping)
 - The configuration file:
-  - "token": add you token to access Bookkeeping
-  - "dataPassNames": asynchronnous pass name, e.g., ["LHC24af_cpass0", "LHC24ag_cpass0"]
+  - "token": add your token to access Bookkeeping
+  - "dataPassNames": asynchronous pass name(s), e.g., ["LHC24af_cpass0", "LHC24ag_cpass0"]
 - Example file: config_rct.json
 - `python3 rct.py config_rct.json`
-- Separate .csv file are saved for each period
+- Separate .csv files are saved for each period if you have more than one period in the configuration file
  
  
