@@ -16,6 +16,8 @@
 - The configuration file:
   - "token": add you token to access Bookkeeping
   - "dataPassNames": asynchronnous pass name, e.g., ["LHC24af_cpass0", "LHC24ag_cpass0"]
-  - example file: config_rct.json
+- Example file: config_rct.json
+- `python3 rct_v3.py config_rct_v2.json`
+- Separate .csv file are saved for each period
  
  
