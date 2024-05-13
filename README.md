@@ -1,4 +1,4 @@
-# How to produce a run list (for Pb-Pb and pp periods in 2023 and 2022)
+# How to produce a run list from the Temporary RCT (Google spreadsheets)
 - The configuration file
   - sheet_name: the name of the google spreadsheets, e.g., `QC_summary_data_2023_pbpb` for 2023 Pb-Pb.
   - tab_name: the name of the tab that you want to take.
@@ -12,7 +12,7 @@
 - `python3 runlist.py config_pp.json`
 - Take `config_pp_2022.json` as the reference configuration file for 2022 periods, config_pp.json or config_pbpb.json for 2023 periods
 
-# How to export runs from RCT
+# How to export runs from RCT (in Bookkeeping)
 - The configuration file:
   - "token": add you token to access Bookkeeping
   - "dataPassNames": asynchronnous pass name, e.g., ["LHC24af_cpass0", "LHC24ag_cpass0"]
