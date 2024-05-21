@@ -1,4 +1,4 @@
-# Produce a run list from the Temporary RCT (Google spreadsheets)
+## Produce a run list from the Temporary RCT (Google spreadsheets)
 - The configuration file
   - sheet_name: the name of the google spreadsheets, e.g., `QC_summary_data_2023_pbpb` for 2023 Pb-Pb.
   - tab_name: the name of the tab that you want to take.
@@ -12,7 +12,7 @@
 - `python3 runlist.py config_pp.json`
 - Take `config_pp_2022.json` as the reference configuration file for 2022 periods, config_pp.json or config_pbpb.json for 2023 periods
 
-# Export runs from RCT (in Bookkeeping)
+## Export runs from RCT (in Bookkeeping)
 - The configuration file:
   - "token": add your token to access Bookkeeping
   - "dataPassNames": asynchronous pass name(s), e.g., ["LHC24af_cpass0", "LHC24ag_cpass0"]
@@ -20,4 +20,7 @@
 - `python3 rct.py config_rct.json`
 - Separate .csv files are saved for each period if you have more than one period in the configuration file
  
- 
+## Calculate and upload mu/INEL rate to RCT
+The scritps needed and the example configuration files can be found under `INEL_Mu`. 
+- `python3 inel_mu_calculation.py mu_inel.json` 
+- `python3 uploading.py upload.json`
