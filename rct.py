@@ -6,7 +6,6 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-
 def fetch_data_pass_ids(api_base_url, token):
     """Fetches all data passes and returns a dictionary mapping names to IDs."""
     url = f"{api_base_url}/dataPasses?token={token}"
@@ -30,7 +29,17 @@ def fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, to
     if not flags:
         return "Not Available"
     
-    latest_flag = max(flags, key=lambda x: datetime.fromisoformat(x['createdAt'].replace('Z', '+00:00')))
+    valid_flags = []
+    for flag in flags:
+        created_at = flag.get('createdAt')
+        if isinstance(created_at, int):
+            created_at_dt = datetime.utcfromtimestamp(created_at / 1000)
+            valid_flags.append((created_at_dt, flag))
+
+    if not valid_flags:
+        return "Not Available"
+
+    latest_flag = max(valid_flags, key=lambda x: x[0])[1]
     return latest_flag['flagType']['method']
 
 def main(config_file):
