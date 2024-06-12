@@ -1,7 +1,7 @@
 import requests
 import csv
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -17,7 +17,13 @@ def fetch_runs(api_base_url, data_pass_id, token):
     """Fetches a list of runs for a given data pass ID from the API."""
     url = f"{api_base_url}/runs?filter[dataPassIds][]={data_pass_id}&token={token}"
     response = requests.get(url, verify=False)
-    return response.json().get('data', [])
+    runs = response.json().get('data', [])
+    
+    # Extract detectors involved in each run
+    for run in runs:
+        run['detectors_involved'] = run.get('detectors', '').split(',')
+    
+    return runs
 
 def fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, token):
     """Fetches quality flags for a specific detector and run."""
@@ -33,7 +39,7 @@ def fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, to
     for flag in flags:
         created_at = flag.get('createdAt')
         if isinstance(created_at, int):
-            created_at_dt = datetime.utcfromtimestamp(created_at / 1000)
+            created_at_dt = datetime.fromtimestamp(created_at / 1000, timezone.utc)
             valid_flags.append((created_at_dt, flag))
 
     if not valid_flags:
@@ -77,9 +83,14 @@ def main(config_file):
                 run_number = run['runNumber']
                 row = [run_number]
                 
-                for detector_id in config['detector_ids'].values():
-                    flag = fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, token)
-                    row.append(flag)
+                involved_detectors = run['detectors_involved']
+                
+                for detector_name, detector_id in config['detector_ids'].items():
+                    if detector_name not in involved_detectors:
+                        row.append("Not present")
+                    else:
+                        flag = fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, token)
+                        row.append(flag)
                 
                 writer.writerow(row)
     
