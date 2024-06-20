@@ -99,7 +99,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Generate run lists based on flag criteria for detectors.")
     parser.add_argument("config_file", help="Path to the JSON configuration file")
-    parser.add_argument("--csv_directory", default=".", help="Path to the directory containing the CSV file (default is current directory)")
+    parser.add_argument("-d", "--csv_directory", default=".", help="Path to the directory containing the CSV file (default is current directory)")
     args = parser.parse_args()
     main(args.config_file, args.csv_directory)
 
