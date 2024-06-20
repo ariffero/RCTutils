@@ -19,7 +19,6 @@
 - Example file: config_rct.json
 - `python3 rct.py config_rct.json`
 - Separate .csv files are saved for each period if you have more than one period in the configuration file
-- **Caveat:** only the latest flag is fetched for a run per detector. Information from time-based flags is partially lost
  
 ## Calculate and upload mu/INEL rate to RCT
 The scritps needed and the example configuration files can be found under `INEL_Mu`. 
