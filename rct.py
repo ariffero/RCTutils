@@ -33,20 +33,28 @@ def fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, to
     flags = data.get('data', [])
     
     if not flags:
-        return "Not Available"
-    
-    valid_flags = []
+        return ["Not Available"]
+
+    # Sort flags by 'updatedAt' timestamp
+    flags.sort(key=lambda x: x['updatedAt'])
+
+    intervals = {}
     for flag in flags:
-        created_at = flag.get('createdAt')
-        if isinstance(created_at, int):
-            created_at_dt = datetime.fromtimestamp(created_at / 1000, timezone.utc)
-            valid_flags.append((created_at_dt, flag))
+        key = (flag['from'], flag['to'])
+        intervals[key] = flag  # Keep only the latest flag for each interval
 
-    if not valid_flags:
+    return list(intervals.values())
+
+def format_flags(flags):
+    """Formats the flags for CSV output."""
+    if flags == ["Not Available"]:
         return "Not Available"
-
-    latest_flag = max(valid_flags, key=lambda x: x[0])[1]
-    return latest_flag['flagType']['method']
+    if len(flags) == 1:
+        return flags[0]['flagType']['method']
+    formatted_flags = []
+    for flag in flags:
+        formatted_flags.append(f"{flag['flagType']['method']} (from: {datetime.utcfromtimestamp(flag['from'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}, to: {datetime.utcfromtimestamp(flag['to'] / 1000).strftime('%Y-%m-%d %H:%M:%S')})")
+    return " | ".join(formatted_flags)
 
 def main(config_file):
     # Load configuration from the specified JSON file
@@ -89,8 +97,8 @@ def main(config_file):
                     if detector_name not in involved_detectors:
                         row.append("Not present")
                     else:
-                        flag = fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, token)
-                        row.append(flag)
+                        flags = fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, token)
+                        row.append(format_flags(flags))
                 
                 writer.writerow(row)
     
