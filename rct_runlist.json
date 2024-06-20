@@ -1,0 +1,28 @@
+{
+    "period": "LHC24af",
+    "pass": "cpass0",
+    "sheets": [
+        {
+            "runlists": [
+                {
+                    "name": "CBT",
+                    "detectors": {
+                        "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
+                        "TPC": ["Good", "LimitedAcceptanceMCReproducible"],
+                        "FT0": ["Good", "LimitedAcceptanceMCReproducible"]
+                    }
+                },
+                {
+                    "name": "CBT_hadronPID",
+                    "detectors": {
+                        "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
+                        "TPC": ["Good", "LimitedAcceptanceMCReproducible"],
+                        "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
+			"TOF": ["Good", "LimitedAcceptanceMCReproducible"]
+                    }
+                }
+            ]
+        }
+    ]
+}
+
