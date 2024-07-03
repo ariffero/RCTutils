@@ -27,3 +27,7 @@
 The scritps needed and the example configuration files can be found under `INEL_Mu`. 
 - `python3 inel_mu_calculation.py mu_inel.json` 
 - `python3 uploading.py upload.json`
+## Flagging multi-runs in RCT
+Currently, only run-based (covering the whole time interval) flags can be added with this script. The flagTypeId can be found at https://ali-bookkeeping.cern.ch/?page=qc-flag-types-overview. `--max_run`, `--min_run` and `--excluded_runs` are optional. If omitted, all runs from the pass will be flagged. 
+- Example command: `python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24a_cpass0" --detector "ITS" --flagTypeId 11 --max_run 106 --min_run 53 --excluded_runs 54`
+
