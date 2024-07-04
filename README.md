@@ -28,8 +28,8 @@ The scritps needed and the example configuration files can be found under `INEL_
 - `python3 inel_mu_calculation.py mu_inel.json` 
 - `python3 uploading.py upload.json`
 ## Flagging multi-runs in RCT
-Currently, only run-based (covering the whole run duration) flags can be added with this script. The `flagTypeId` can be found at [QC flag types in Bookkeeping](https://ali-bookkeeping.cern.ch/?page=qc-flag-types-overview). `--max_run`, `--min_run` and `--excluded_runs` are optional. If omitted, all runs from the pass will be flagged. 
+Currently, only run-based (covering the whole run duration) flags can be added with this script. Put your Bookkeeping token to the json configuration file. The `flagTypeId` can be found at [QC flag types in Bookkeeping](https://ali-bookkeeping.cern.ch/?page=qc-flag-types-overview). `--max_run`, `--min_run` and `--excluded_runs` are optional. If omitted, all runs from the pass will be flagged. 
 - Example command: `python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24a_cpass0" --detector "ITS" --flagTypeId 11 --max_run 106 --min_run 53 --excluded_runs 54`
 ## Verifying multi-runs in RCT
-Both the latest run-based and time-dependent flags for each run can be verified with this script. The `--max_run`, `--min_run` and `--excluded_runs` are optional. If omitted, all runs from the pass will be verified.
+Both the latest run-based and time-dependent flags for each run can be verified with this script. Put your Bookkeeping token to the json configuration file. The `--comment`, `--max_run`, `--min_run` and `--excluded_runs` are optional. If omitted, all runs from the pass will be verified.
 - Example command: `python3 test_rct_verify_flag.py test_rct_verify_flag.json --data_pass "LHC22a_apass1" --detector "FT0"  --max_run 106 --min_run 53 --excluded_runs 54 --comment "test"`
