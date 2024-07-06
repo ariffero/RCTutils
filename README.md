@@ -28,8 +28,12 @@ The scritps needed and the example configuration files can be found under `INEL_
 - `python3 inel_mu_calculation.py mu_inel.json` 
 - `python3 uploading.py upload.json`
 ## Flagging multi-runs in RCT
-Currently, only run-based (covering the whole run duration) flags can be added with this script. Put your Bookkeeping token to the json configuration file. The `flagTypeId` can be found at [QC flag types in Bookkeeping](https://ali-bookkeeping.cern.ch/?page=qc-flag-types-overview). `--max_run`, `--min_run` and `--excluded_runs` are optional. If omitted, all runs from the pass will be flagged. 
-- Example command: `python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24a_cpass0" --detector "ITS" --flagTypeId 11 --max_run 106 --min_run 53 --excluded_runs 54`
+Currently, only run-based (covering the whole run duration) flags can be added with this script. Put your Bookkeeping token to the json configuration file. The `flagTypeId` can be found at [QC flag types in Bookkeeping](https://ali-bookkeeping.cern.ch/?page=qc-flag-types-overview). `--max_run`, `--min_run`, `--excluded_runs` and `--comment` are optional. If omitted, all runs from the pass will be flagged. 
+- Example command for unique flag type and comment: `python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24a_cpass0" --detector "ITS" --flagTypeId 11 --max_run 106 --min_run 53 --excluded_runs 54`
+- Example command for multiple flags and comments in a .csv file: `python3 test_rct_post_flag.py test_rct_post_flag.json --data_pass "LHC24al_cpass0" --detector "ITS" -b ITS_flag.csv`. The format of the file, Refer to the Example.csv.
 ## Verifying multi-runs in RCT
-Both the latest run-based and time-dependent flags for each run can be verified with this script. Put your Bookkeeping token to the json configuration file. The `--comment`, `--max_run`, `--min_run` and `--excluded_runs` are optional. If `--max_run` and `--min_run` are omitted, all runs from the pass will be verified.
+Both the latest run-based and time-dependent flags for each run can be verified with this script. Put your Bookkeeping token to the json configuration file. The `--comment`, `--max_run`, `--min_run` and `--excluded_runs` are optional. If `--max_run` and `--min_run` are omitted, all runs from the pass will be verified. **This script is not well tested. Suggest verifying the time-dependent flags by hand.** 
 - Example command: `python3 rct_verify_flag.py rct_verify_flag.json --data_pass "LHC22a_apass1" --detector "FT0"  --max_run 106 --min_run 53 --excluded_runs 54 --comment "test"`
+## How to generate a token in BK/RCT
+- Login to the BK
+- Open the `Developer Tools` and type `sessionService.session.token` to produce the token. 
