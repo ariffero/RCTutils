@@ -2,7 +2,12 @@
     "run_api_url": "https://ali-bookkeeping.cern.ch/api",
     "flag_api_url": "https://ali-bookkeeping.cern.ch/api/qcFlags/perDataPass",
     "token": "",
-    "dataPassNames": ["LHC24af_cpass0", "LHC24ag_cpass0"],
+    "dataPassNames": {
+        "LHC23zzo_apass3": {},
+        "LHC24al_cpass0": {
+            "run_range": [554413,554538]
+        }
+    },
     "detector_ids": {
         "CPV": 236, "EMC": 264, "FDD": 229, "FT0": 242, "FV0": 228,
         "HMP": 260, "ITS": 230, "MCH": 240, "MFT": 261, "MID": 239,

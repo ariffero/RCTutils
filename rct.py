@@ -57,7 +57,6 @@ def format_flags(flags):
     return " | ".join(formatted_flags)
 
 def main(config_file):
-    # Load configuration from the specified JSON file
     with open(config_file, 'r') as file:
         config = json.load(file)
     
@@ -66,24 +65,26 @@ def main(config_file):
     token = config['token']
     data_pass_names = config['dataPassNames']
 
-    # Get mapping of data pass names to IDs
     data_pass_ids = fetch_data_pass_ids(api_base_url, token)
 
-    # Process each data pass name
-    for data_pass_name in data_pass_names:
+    for data_pass_name, data_pass_info in data_pass_names.items():
         data_pass_id = data_pass_ids.get(data_pass_name)
         if not data_pass_id:
             print(f"No data pass ID found for {data_pass_name}")
             continue
         runs = fetch_runs(api_base_url, data_pass_id, token)
         
-        # Define the CSV filename based on the data pass name
+        run_range = data_pass_info.get("run_range", [None, None])
+        if run_range[0] is not None:
+            runs = [run for run in runs if run['runNumber'] >= run_range[0]]
+        if run_range[1] is not None:
+            runs = [run for run in runs if run['runNumber'] <= run_range[1]]
+        
         safe_name = data_pass_name.replace(' ', '_').replace('/', '_')
         csv_filename = f'Runs_{safe_name}.csv'
         
         with open(csv_filename, 'w', newline='') as file:
             writer = csv.writer(file)
-            # Write headers with detector names
             headers = ['Run Number'] + [name for name in config['detector_ids'].keys()]
             writer.writerow(headers)
 
