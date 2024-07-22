@@ -3,6 +3,7 @@ import csv
 import json
 from datetime import datetime, timezone
 import urllib3
+import argparse
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -57,6 +58,7 @@ def format_flags(flags):
     return " | ".join(formatted_flags)
 
 def main(config_file):
+    # Load configuration from the specified JSON file
     with open(config_file, 'r') as file:
         config = json.load(file)
     
@@ -65,8 +67,10 @@ def main(config_file):
     token = config['token']
     data_pass_names = config['dataPassNames']
 
+    # Get mapping of data pass names to IDs
     data_pass_ids = fetch_data_pass_ids(api_base_url, token)
 
+    # Process each data pass name
     for data_pass_name, data_pass_info in data_pass_names.items():
         data_pass_id = data_pass_ids.get(data_pass_name)
         if not data_pass_id:
@@ -74,17 +78,27 @@ def main(config_file):
             continue
         runs = fetch_runs(api_base_url, data_pass_id, token)
         
+        # Filter runs by range if specified
         run_range = data_pass_info.get("run_range", [None, None])
         if run_range[0] is not None:
             runs = [run for run in runs if run['runNumber'] >= run_range[0]]
         if run_range[1] is not None:
             runs = [run for run in runs if run['runNumber'] <= run_range[1]]
         
+        # Define the CSV filename based on the data pass name and run range
         safe_name = data_pass_name.replace(' ', '_').replace('/', '_')
-        csv_filename = f'Runs_{safe_name}.csv'
+        if run_range[0] is not None and run_range[1] is not None:
+            csv_filename = f'Runs_{safe_name}_{run_range[0]}_{run_range[1]}.csv'
+        elif run_range[0] is not None:
+            csv_filename = f'Runs_{safe_name}_from_{run_range[0]}.csv'
+        elif run_range[1] is not None:
+            csv_filename = f'Runs_{safe_name}_to_{run_range[1]}.csv'
+        else:
+            csv_filename = f'Runs_{safe_name}.csv'
         
         with open(csv_filename, 'w', newline='') as file:
             writer = csv.writer(file)
+            # Write headers with detector names
             headers = ['Run Number'] + [name for name in config['detector_ids'].keys()]
             writer.writerow(headers)
 
@@ -106,7 +120,6 @@ def main(config_file):
         print(f"Data has been written to {csv_filename}")
 
 if __name__ == "__main__":
-    import argparse
     parser = argparse.ArgumentParser(description="Fetch run and detector data based on configuration.")
     parser.add_argument("config_file", help="Path to the JSON configuration file")
     args = parser.parse_args()
