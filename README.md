@@ -15,8 +15,17 @@
 ## Export runs from RCT (in Bookkeeping)
 - The configuration file:
   - "token": add your token to access Bookkeeping
-  - "dataPassNames": asynchronous pass name(s), e.g., ["LHC24af_cpass0", "LHC24ag_cpass0"]
-- Example file: config_rct.json. The range of runs can be set in this configration file by the "run_range" for each period. No filtering on the runs if the "run_range" is null. 
+  - "dataPassNames": asynchronous pass name(s). Example:
+```
+    "dataPassNames": {
+        "LHC23zzo_apass3": {},
+        "LHC24al_cpass0": {
+            "run_range": [554413,554538]
+        }
+    },
+```
+The range of runs can be set in this configration file by the "run_range" for each period. No filtering on the runs if the "run_range" is null.
+- Example file: config_rct.json.  
 - `python3 rct.py config_rct.json`
 - Separate .csv files are saved for each period if you have more than one period in the configuration file
 ## Produce run lists from RCT
