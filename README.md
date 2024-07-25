@@ -55,4 +55,8 @@ python3 rct_verify_flag.py rct_verify_flag.json --data_pass "LHC22a_apass1" --de
 ```
 ## How to generate a token in BK/RCT
 - Login to the BK
-- In your browser, open the `Developer Tools`, type `sessionService.session.token`, and press Enter to produce the token. 
+- In your browser (below an example in Chrome), 
+<img src="images/Browser.png" alt="Browser" width="500"/>
+navigate to the settings (3-dot icon on the left) -> open the `Developer Tools`,
+<img src="images/dev_tool.png" alt="dev" width="500"/>
+type `sessionService.session.token`, and press Enter to produce the token. 
