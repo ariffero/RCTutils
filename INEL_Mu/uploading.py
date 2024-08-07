@@ -25,8 +25,20 @@ if not latest_csv_file:
     print("No CSV files found.")
     exit(1)
 
-# Load the CSV file
-data = pd.read_csv(latest_csv_file)
+# Check if the latest CSV file is empty or has no valid data
+if os.path.getsize(latest_csv_file) == 0:
+    print(f"The latest CSV file '{latest_csv_file}' is empty.")
+    exit(1)
+
+# Try to load the CSV file, catch exceptions if it fails
+try:
+    data = pd.read_csv(latest_csv_file)
+    if data.empty:
+        print(f"The CSV file '{latest_csv_file}' contains no data.")
+        exit(1)
+except pd.errors.EmptyDataError:
+    print(f"The CSV file '{latest_csv_file}' contains no columns to parse.")
+    exit(1)
 
 # Function to update inelastic interaction rate
 def update_inelastic_interaction_rate(run_number, inel_value):

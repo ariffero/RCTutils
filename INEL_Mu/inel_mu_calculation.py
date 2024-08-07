@@ -73,12 +73,19 @@ for row in new_runs:
         row["runType"]["name"] != "PHYSICS" or 
         row["runQuality"] != "good"):
         continue
+    
+    # Convert time fields to datetime
+    start_time_o2 = datetime.datetime.fromtimestamp(row["timeO2Start"] // 1000, utc).astimezone(cet)
+    end_time_o2 = None
+    if row["timeO2End"]:
+        end_time_o2 = datetime.datetime.fromtimestamp(row["timeO2End"] // 1000, utc).astimezone(cet)
+
     filtered_runs.append({
         'run_number': row['runNumber'],
         'time_trg_start': row['timeTrgStart'],
         'filling_scheme_name': row['lhcFill']['fillingSchemeName'],
-        'start_time_o2': datetime.datetime.fromtimestamp(row["timeO2Start"] // 1000, utc).astimezone(cet),
-        'end_time_o2': datetime.datetime.fromtimestamp(row["timeO2End"] // 1000, utc).astimezone(cet)
+        'start_time_o2': start_time_o2,
+        'end_time_o2': end_time_o2
     })
 
 # Helper functions to mimic Excel formulas
@@ -126,6 +133,10 @@ for run in filtered_runs:
     start_time_o2 = run['start_time_o2']
     end_time_o2 = run['end_time_o2']
     
+    # Skip runs with None end_time_o2
+    if end_time_o2 is None:
+        continue
+    
     # Extract values using the process logic
     ft0_vtx, o2_end, o2_start = extract_values(run_number, time_trg_start)
     
@@ -142,8 +153,11 @@ for run in filtered_runs:
         'inel': ao  # Assuming 'inel' corresponds to AO
     })
 
+# Filter out runs with None end_time_o2 before saving to cache
+valid_runs_for_cache = [run['run_number'] for run in filtered_runs if run['end_time_o2'] is not None]
+
 # Save the updated list of run numbers to the cache
-save_cache(current_runs)
+save_cache(valid_runs_for_cache)
 
 # Get current timestamp
 timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
