@@ -29,6 +29,7 @@ with open(args.config_file, 'r') as config_file:
 TOKEN = config['token']
 MIN_RUN_NUMBER = config['min_run_number']
 EXCLUDE_RUNS = config['exclude_runs']
+BEAM_ENERGY_MAPPING = config['beam_energy_mapping']  # Load the beam energy mapping
 
 # Define the cache file path
 CACHE_FILE = 'run_cache.json'
@@ -84,7 +85,9 @@ for row in new_runs:
         'time_trg_start': row['timeTrgStart'],
         'filling_scheme_name': row['lhcFill']['fillingSchemeName'],
         'start_time_trigger': start_time_trigger,
-        'end_time_trigger': end_time_trigger
+        'end_time_trigger': end_time_trigger,
+        'beam_type': row['lhcFill']['beamType'],
+        'beam_energy': round(row['lhcBeamEnergy'])  # Rounding the beam energy
     })
 
 # Helper functions to mimic Excel formulas
@@ -95,8 +98,11 @@ def calculate_ai(ah, end_time, start_time):
 def calculate_am(ai, al):
     return -np.log(1 - ai / 11245 / al)
 
-def calculate_an(am):
-    return am / 0.757
+def calculate_an(am, beam_type, beam_energy):
+    # Retrieve the value for AN based on the beam type and energy
+    energy_mapping = BEAM_ENERGY_MAPPING.get(beam_type, {})
+    an_value = energy_mapping.get(str(beam_energy), 0.757)  # Default to 0.757 if not found
+    return am / an_value
 
 def calculate_ao(al, an):
     return al * an * 11245
@@ -131,6 +137,8 @@ for run in filtered_runs:
     filling_scheme_name = run['filling_scheme_name']
     start_time_trigger = run['start_time_trigger']
     end_time_trigger = run['end_time_trigger']
+    beam_type = run['beam_type']
+    beam_energy = run['beam_energy']
     
     # Skip runs with None end_time_trigger2
     if end_time_trigger is None:
@@ -143,14 +151,13 @@ for run in filtered_runs:
     ai = calculate_ai(ft0_vtx, end_time_trigger, start_time_trigger)
     al = regex_extract(filling_scheme_name, "[A-Za-z0-9]+_[A-Za-z0-9]+_[0-9]+_([0-9]+)_.*")
     am = calculate_am(ai, al)
-    an = calculate_an(am)
+    an = calculate_an(am, beam_type, beam_energy)
     ao = calculate_ao(al, an)
     results.append({
         'run': run_number,
         'mu': an,  # Assuming 'mu' corresponds to AN
         'inel': ao  # Assuming 'inel' corresponds to AO
     })
-
 
 # Save the updated list of run numbers to the cache
 save_cache(current_runs)
