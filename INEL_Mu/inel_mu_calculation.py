@@ -62,7 +62,7 @@ if 'data' not in runs_data:
 
 # Load cached run numbers
 cached_runs = load_cache()
-current_runs = [row['runNumber'] for row in runs_data['data'] if row['runNumber'] >= MIN_RUN_NUMBER and row['runNumber'] not in EXCLUDE_RUNS]
+current_runs = [row['runNumber'] for row in runs_data['data'] if row['runNumber'] >= MIN_RUN_NUMBER and row['runNumber'] not in EXCLUDE_RUNS and row['timeTrgEnd'] is not None]
 new_runs = [row for row in runs_data['data'] if row['runNumber'] not in cached_runs and row['runNumber'] >= MIN_RUN_NUMBER and row['runNumber'] not in EXCLUDE_RUNS]
 
 # Filtering and preparing the new run data
@@ -75,17 +75,16 @@ for row in new_runs:
         continue
     
     # Convert time fields to datetime
-    start_time_o2 = datetime.datetime.fromtimestamp(row["timeO2Start"] // 1000, utc).astimezone(cet)
-    end_time_o2 = None
-    if row["timeO2End"]:
-        end_time_o2 = datetime.datetime.fromtimestamp(row["timeO2End"] // 1000, utc).astimezone(cet)
-
+    start_time_trigger = datetime.datetime.fromtimestamp(row["timeTrgStart"] // 1000, utc).astimezone(cet)
+    end_time_trigger = None
+    if row["timeTrgEnd"]:
+        end_time_trigger = datetime.datetime.fromtimestamp(row["timeTrgEnd"] // 1000, utc).astimezone(cet)
     filtered_runs.append({
         'run_number': row['runNumber'],
         'time_trg_start': row['timeTrgStart'],
         'filling_scheme_name': row['lhcFill']['fillingSchemeName'],
-        'start_time_o2': start_time_o2,
-        'end_time_o2': end_time_o2
+        'start_time_trigger': start_time_trigger,
+        'end_time_trigger': end_time_trigger
     })
 
 # Helper functions to mimic Excel formulas
@@ -97,7 +96,7 @@ def calculate_am(ai, al):
     return -np.log(1 - ai / 11245 / al)
 
 def calculate_an(am):
-    return am / 0.68
+    return am / 0.757
 
 def calculate_ao(al, an):
     return al * an * 11245
@@ -130,31 +129,30 @@ for run in filtered_runs:
     run_number = run['run_number']
     time_trg_start = run['time_trg_start']
     filling_scheme_name = run['filling_scheme_name']
-    start_time_o2 = run['start_time_o2']
-    end_time_o2 = run['end_time_o2']
+    start_time_trigger = run['start_time_trigger']
+    end_time_trigger = run['end_time_trigger']
     
-    # Skip runs with None end_time_o2
-    if end_time_o2 is None:
+    # Skip runs with None end_time_trigger2
+    if end_time_trigger is None:
         continue
     
     # Extract values using the process logic
     ft0_vtx, o2_end, o2_start = extract_values(run_number, time_trg_start)
     
-    # Use start_time_o2 and end_time_o2 directly in the calculation
-    ai = calculate_ai(ft0_vtx, end_time_o2, start_time_o2)
+    # Use start_time_trigger2 and end_time_trigger directly in the calculation
+    ai = calculate_ai(ft0_vtx, end_time_trigger, start_time_trigger)
     al = regex_extract(filling_scheme_name, "[A-Za-z0-9]+_[A-Za-z0-9]+_[0-9]+_([0-9]+)_.*")
     am = calculate_am(ai, al)
     an = calculate_an(am)
     ao = calculate_ao(al, an)
-    
     results.append({
         'run': run_number,
         'mu': an,  # Assuming 'mu' corresponds to AN
         'inel': ao  # Assuming 'inel' corresponds to AO
     })
 
-# Filter out runs with None end_time_o2 before saving to cache
-valid_runs_for_cache = [run['run_number'] for run in filtered_runs if run['end_time_o2'] is not None]
+# Filter out runs with None end_time_trigger before saving to cache
+valid_runs_for_cache = (current_runs)
 
 # Save the updated list of run numbers to the cache
 save_cache(valid_runs_for_cache)
