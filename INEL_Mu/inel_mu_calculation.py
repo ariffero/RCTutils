@@ -151,11 +151,9 @@ for run in filtered_runs:
         'inel': ao  # Assuming 'inel' corresponds to AO
     })
 
-# Filter out runs with None end_time_trigger before saving to cache
-valid_runs_for_cache = (current_runs)
 
 # Save the updated list of run numbers to the cache
-save_cache(valid_runs_for_cache)
+save_cache(current_runs)
 
 # Get current timestamp
 timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
