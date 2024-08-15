@@ -1,6 +1,12 @@
 {
     "token": "",
     "min_run_number": 548687,
-    "exclude_runs": []
+    "exclude_runs": [],
+    "beam_energy_mapping": {
+        "PROTON - PROTON": {
+            "6800": 0.768,
+            "450": 0.68
+        }
+    }
 }
 
