@@ -8,6 +8,7 @@ import datetime
 import pytz
 import os
 import argparse
+import math
 
 # Suppress the InsecureRequestWarning
 import urllib3
@@ -46,6 +47,13 @@ def save_cache(run_numbers):
     with open(CACHE_FILE, 'w') as f:
         json.dump(run_numbers, f, indent=4)
 
+# Function to round the beam energy to keep only the first two significant digits
+def round_beam_energy(energy):
+    # Determine the magnitude of the number
+    magnitude = 10 ** (int(math.floor(math.log10(abs(energy)))) - 1)
+    # Round to the nearest two significant digits
+    return round(energy / magnitude) * magnitude
+
 # Step 1: Retrieve the JSON data
 url = f"https://ali-bookkeeping.cern.ch/api/runs?filter[definitions]=PHYSICS&page[offset]=0&filter[tags][operation]=none-of&filter[tags][values]=Not+for+physics&token={TOKEN}"
 response = requests.get(url, verify=False)
@@ -80,6 +88,9 @@ for row in new_runs:
     end_time_trigger = None
     if row["timeTrgEnd"]:
         end_time_trigger = datetime.datetime.fromtimestamp(row["timeTrgEnd"] // 1000, utc).astimezone(cet)
+    
+    rounded_energy = round_beam_energy(row['lhcBeamEnergy'])
+    
     filtered_runs.append({
         'run_number': row['runNumber'],
         'time_trg_start': row['timeTrgStart'],
@@ -87,7 +98,7 @@ for row in new_runs:
         'start_time_trigger': start_time_trigger,
         'end_time_trigger': end_time_trigger,
         'beam_type': row['lhcFill']['beamType'],
-        'beam_energy': round(row['lhcBeamEnergy'])  # Rounding the beam energy
+        'beam_energy': rounded_energy  # Use the rounded beam energy
     })
 
 # Helper functions to mimic Excel formulas
@@ -117,7 +128,7 @@ def extract_values(run_number, time_trg_start):
     output = subprocess.check_output(cmd, shell=True, text=True)
     
     ft0_vtx, o2_end, o2_start = None, None, None
-
+    
     for line in output.split("\n"):
         if "TRG=" in line:
             ft0_vtx = float(line.split("TRG=")[1].split()[0].strip())
@@ -140,19 +151,20 @@ for run in filtered_runs:
     beam_type = run['beam_type']
     beam_energy = run['beam_energy']
     
-    # Skip runs with None end_time_trigger2
+    # Skip runs with None end_time_trigger
     if end_time_trigger is None:
         continue
     
     # Extract values using the process logic
     ft0_vtx, o2_end, o2_start = extract_values(run_number, time_trg_start)
     
-    # Use start_time_trigger2 and end_time_trigger directly in the calculation
+    # Use start_time_trigger and end_time_trigger directly in the calculation
     ai = calculate_ai(ft0_vtx, end_time_trigger, start_time_trigger)
     al = regex_extract(filling_scheme_name, "[A-Za-z0-9]+_[A-Za-z0-9]+_[0-9]+_([0-9]+)_.*")
     am = calculate_am(ai, al)
     an = calculate_an(am, beam_type, beam_energy)
     ao = calculate_ao(al, an)
+
     results.append({
         'run': run_number,
         'mu': an,  # Assuming 'mu' corresponds to AN
