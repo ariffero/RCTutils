@@ -3,9 +3,9 @@
     "flag_api_url": "https://ali-bookkeeping.cern.ch/api/qcFlags",
     "token": "",
     "detector_ids": {
-        "CPV": 236, "EMC": 264, "FDD": 229, "FT0": 242, "FV0": 228,
-        "HMP": 260, "ITS": 230, "MCH": 240, "MFT": 261, "MID": 239,
-        "PHS": 243, "TOF": 245, "TPC": 241, "TRD": 263, "ZDC": 265
+        "CPV": 5, "EMC": 6, "FDD": 15, "FT0": 14, "FV0": 13,
+        "HMP": 1, "ITS": 7, "MCH": 2, "MFT": 8, "MID": 3,
+        "PHS": 12, "TOF": 9, "TPC": 4, "TRD": 10, "ZDC": 11
     }
 }
 
