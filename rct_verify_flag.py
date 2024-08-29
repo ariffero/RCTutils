@@ -148,7 +148,7 @@ for run in runs:
         print(f"Verifying flag {flag_id} for run {run_number}")
 
         # Make the POST request
-        response = requests.post(url, params=params, json=data)
+        response = requests.post(url, params=params, json=data, verify=False)
 
         # Print the response
         #print(f"Run {run_number}, Flag {flag_id} - Status Code:", response.status_code)
