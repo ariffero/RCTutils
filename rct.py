@@ -74,7 +74,7 @@ def main(config_file):
     for data_pass_name, data_pass_info in data_pass_names.items():
         data_pass_id = data_pass_ids.get(data_pass_name)
         if not data_pass_id:
-            print(f"No data pass ID found for {data_pass_name}")
+            print(f"No data pass ID found for {data_pass_name}. Check if your token is still valid; the token validity is 1 week only.")
             continue
         runs = fetch_runs(api_base_url, data_pass_id, token)
         

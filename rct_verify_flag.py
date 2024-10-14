@@ -92,7 +92,7 @@ data_pass_ids = fetch_data_pass_ids(API_BASE_URL, TOKEN)
 # Get the data pass ID for the specified data pass name
 data_pass_id = data_pass_ids.get(args.data_pass)
 if not data_pass_id:
-    print(f"No data pass ID found for {args.data_pass}")
+    print(f"No data pass ID found for {args.data_pass}. Check if your token is still valid; the token validity is 1 week only.")
     exit(1)
 
 
