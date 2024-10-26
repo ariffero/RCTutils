@@ -3,6 +3,7 @@ import json
 import argparse
 import urllib3
 import pandas as pd
+import os
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -40,6 +41,78 @@ def read_csv_file(csv_file):
     df = pd.read_csv(csv_file, header=None)
     return [{"run_number": int(row[0]), "flagTypeId": int(row[1]), "comment": row[2]} for _, row in df.iterrows()]
 
+# function to produce the minutes for the aQC meeting
+def produce_minutes(csv_data, outputFile):
+
+    # number of runs of each quality
+    n_good_runs = 0
+    n_bad_runs = 0
+    n_lim_acc_runs = 0
+
+    #list with the runs of each quality
+    good_runs = list()
+    bad_runs = list()
+    lim_acc_runs = list()
+
+    # write all the analyzed runs and fill the lists
+    f = open(outputFile, "a")
+    f.write('\nRuns: ')
+    for index, row in enumerate(csv_data):
+        run_number = row["run_number"]
+        if(row["flagTypeId"]==9):
+            n_good_runs = n_good_runs + 1
+            good_runs.append(run_number)
+        if(row["flagTypeId"]==7):
+            n_bad_runs = n_bad_runs + 1
+            bad_runs.append(run_number)
+        if(row["flagTypeId"]==5):
+            n_lim_acc_runs = n_lim_acc_runs + 1
+            lim_acc_runs.append(run_number)
+        if index != len(csv_data) - 1:
+            f.write(str(run_number) + ', ')
+        else:
+            f.write(str(run_number) + '.\n')
+        print(str(run_number) + ', ')
+    
+    # write the minutes based on the values found in the csv
+    if(n_good_runs==len(csv_data)):
+        f.write("All the runs are GOOD.\n")
+        return
+
+    elif(n_bad_runs==len(csv_data)):
+        f.write("All the runs have been flagged as Bad tracking, due to huge part of the detector missing.\n")
+        return
+
+    elif(n_lim_acc_runs==len(csv_data)):
+        f.write("All the runs have been flagged as Limited acceptance (MC reproducible).\n")
+        return
+
+    if(n_good_runs != 0):
+        f.write('GOOD runs: ')
+        for k in range(0, n_good_runs):
+            if(k != n_good_runs-1):
+                f.write(str(good_runs[k]) + ', ')
+            else:
+                f.write(str(good_runs[k]) + '.\n')
+
+    if(n_bad_runs != 0):
+        f.write('Runs flagged as Bad tracking: ')
+        for k in range(0, n_bad_runs):
+            if(k != n_bad_runs-1):
+                f.write(str(bad_runs[k]) + ', ')
+            else:
+                f.write(str(bad_runs[k]) + '.\n')
+
+    if(n_lim_acc_runs != 0):
+        f.write('Runs flagged as Limited acceptance (MC reproducible): ')
+        for k in range(0, n_lim_acc_runs):
+            if(k != n_lim_acc_runs-1):
+                f.write(str(lim_acc_runs[k]) + ', ')
+            else:
+                f.write(str(lim_acc_runs[k]) + '.\n')
+
+    f.write('\n')
+
 # Set up argument parsing
 parser = argparse.ArgumentParser(description="Post a quality control flag.")
 parser.add_argument('config', type=str, help='Path to the configuration file')
@@ -51,6 +124,7 @@ parser.add_argument('--min_run', type=int, help='Minimum run number')
 parser.add_argument('--max_run', type=int, help='Maximum run number')
 parser.add_argument('--excluded_runs', type=int, nargs='*', default=[], help='List of run numbers to exclude')
 parser.add_argument('-b', '--batch', type=str, help='Path to CSV file for batch mode')
+parser.add_argument('--minutes', type=str, help='Name of the output file containing the minutes')
 args = parser.parse_args()
 
 # Check for incompatible arguments
@@ -58,6 +132,9 @@ if args.batch:
     if args.min_run or args.max_run or args.excluded_runs or args.comment or args.flagTypeId:
         parser.error("--min_run, --max_run, --excluded_runs, --comment, and --flagTypeId cannot be used with -b/--batch")
 
+if not args.batch:
+    if args.minutes:
+        parser.error('--minutes can be used only in batch mode')
 # Load configuration from the specified JSON file
 config = load_config(args.config)
 
@@ -112,6 +189,17 @@ if args.batch:
             print(f"Error: Run number {run_number} not found.")
             continue
         post_flag(run_number, row["flagTypeId"], row["comment"])
+
+    # create the minutes only in batch mode and if requested
+    if(args.minutes):
+        outputFile = args.minutes
+        # use the minutes file if already present or create a new one if missing
+        with open(outputFile, "a" if os.path.isfile(outputFile) else "w") as f:
+            f.write(args.data_pass)
+            f.close()
+        # write the minutes
+        produce_minutes(csv_data,outputFile)
+
 else:
     # Non-batch mode
     for run in runs:
