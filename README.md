@@ -60,4 +60,5 @@ python3 rct_verify_flag.py rct_verify_flag.json --data_pass "LHC22a_apass1" --de
 navigate to the settings (3-dot icon on the left) -> open the `Developer Tools`,
 <img src="images/dev_tool.png" alt="dev" width="500"/>
 type `sessionService.session.token`, and press Enter to produce the token.
+
 **The token expires in 1 week! One needs to reproduce it regularly.** 
