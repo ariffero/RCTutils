@@ -42,11 +42,14 @@ Currently, only run-based (covering the whole run duration) flags can be added w
 ```
 python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24a_cpass0" --detector "ITS" --flagTypeId 11 --max_run 106 --min_run 53 --excluded_runs 54
 ```
-- Example command for multiple flags and comments in a .csv file: 
+- Example command for multiple flags and comments in a .csv file. The structure of the .csv file needs to be as the one in test.csv, meaning that you need a column called 'post' that indicates the runs that you want to post, a column called `run_number` that contains the list of the runs, and several column with the name of a certain pass (e.g. `LHC24an_apass1_skimmed`) that contains the run quality for that pass, and a colum called `comment` that contains the comment to the run. The quality posted on the RCT correspond to the quality of the run in the pass provided in input using `--data_pass`. Note that you need a .csv file for each period, but per peiod you can have the quality of the different passes. To include a certain run in the run posted write `ok` under the column `post` in the .csv file.
 ```
-python3 test_rct_post_flag.py test_rct_post_flag.json --data_pass "LHC24al_cpass0" --detector "ITS" -b ITS_flag.csv
+python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24al_cpass0" --detector "ITS" -b test.csv
 ```
-The format of the file refers to the Example.csv.
+- It is possible to have in output a file that contains the minutes for the aQC meeting, based on the posted runs. To produce it use the argument `--minutes <name_of_the_file.txt>`, if the file is not present it will be generated and filled, otherwise the new info will be added to that file. If you are checking a run in a pass that is not `apass0` you may want to say explicitly that the quality of the run in the new pass is the same as in the previous pass, you can add this info to the minutes by adding the arguent `--no_diff`. At the moment this possibility is present only when using the script in batch mode. An example of the command to post the flags and obtain the minutes is:
+```
+python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24al_cpass0" --detector "ITS" -b test.csv --minutes minutes.txt --no_diff
+```
 ## Verifying multi-runs in RCT
 Both the latest run-based and time-dependent flags for each run can be verified with this script. Put your Bookkeeping token to the json configuration file. The `--comment`, `--max_run`, `--min_run` and `--excluded_runs` are optional. If `--max_run` and `--min_run` are omitted, all runs from the pass will be verified. Add your BK token to the configuration json file. **This script is not well tested. Suggest verifying the time-dependent flags by hand.** 
 - Example command:

@@ -4,6 +4,7 @@ import argparse
 import urllib3
 import pandas as pd
 import os
+import math
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -37,19 +38,20 @@ def is_run_excluded(run_number, excluded_runs):
     return run_number in excluded_runs
 
 def read_csv_file(csv_file):
-    """Read the CSV file and return a list of dictionaries with keys: run_number, flagTypeId, and comment."""
-    df = pd.read_csv(csv_file, header=None)
-    return [{"run_number": int(row[0]), "flagTypeId": int(row[1]), "comment": row[2]} for _, row in df.iterrows()]
+    """Read the CSV file and return a list of dictionaries with keys: given by the 1st row. Needed keys: post, run_number, a column with the name of a pass"""
+    df = pd.read_csv(csv_file)
+    return df.to_dict(orient='records')
 
 # function to produce the minutes for the aQC meeting
-def produce_minutes(csv_data, outputFile):
-
+def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
     # number of runs of each quality
+    n_runs = 0 # tot number of runs
     n_good_runs = 0
     n_bad_runs = 0
     n_lim_acc_runs = 0
 
     #list with the runs of each quality
+    runs = list()
     good_runs = list()
     bad_runs = list()
     lim_acc_runs = list()
@@ -58,33 +60,47 @@ def produce_minutes(csv_data, outputFile):
     f = open(outputFile, "a")
     f.write('\nRuns: ')
     for index, row in enumerate(csv_data):
+        if(row['post'] != 'ok'):
+            continue
         run_number = row["run_number"]
-        if(row["flagTypeId"]==9):
+        runs.append(run_number)
+        n_runs = n_runs + 1
+        print(run_number)
+        if(row[flagTypeIdPass]==9):
             n_good_runs = n_good_runs + 1
             good_runs.append(run_number)
-        if(row["flagTypeId"]==7):
+        if(row[flagTypeIdPass]==7):
             n_bad_runs = n_bad_runs + 1
             bad_runs.append(run_number)
-        if(row["flagTypeId"]==5):
+        if(row[flagTypeIdPass]==5):
             n_lim_acc_runs = n_lim_acc_runs + 1
             lim_acc_runs.append(run_number)
-        if index != len(csv_data) - 1:
-            f.write(str(run_number) + ', ')
+        
+    for run in range (0, n_runs):  
+        if(run != n_runs-1):
+            f.write(str(runs[run]) + ', ')
         else:
-            f.write(str(run_number) + '.\n')
-        print(str(run_number) + ', ')
+            f.write(str(runs[run]) + '.\n')
     
+    sameQuality = 'The quality was the same in the previous pass.'
+
     # write the minutes based on the values found in the csv
-    if(n_good_runs==len(csv_data)):
-        f.write("All the runs are GOOD.\n")
+    if(n_good_runs==n_runs):
+        f.write("All the runs are GOOD.\n\n")
         return
 
-    elif(n_bad_runs==len(csv_data)):
-        f.write("All the runs have been flagged as Bad tracking, due to huge part of the detector missing.\n")
+    elif(n_bad_runs==n_runs):
+        if noDiff:
+            f.write("All the runs have been flagged as Bad tracking, due to huge part of the detector missing. " + sameQuality + "\n\n")
+        else:
+            f.write("All the runs have been flagged as Bad tracking, due to huge part of the detector missing.\n\n")
         return
 
-    elif(n_lim_acc_runs==len(csv_data)):
-        f.write("All the runs have been flagged as Limited acceptance (MC reproducible).\n")
+    elif(n_lim_acc_runs==n_runs):
+        if noDiff:
+            f.write("All the runs have been flagged as Limited acceptance (MC reproducible). " + sameQuality + ".\n\n")
+        else:
+            f.write("All the runs have been flagged as Limited acceptance (MC reproducible).\n\n")
         return
 
     if(n_good_runs != 0):
@@ -101,7 +117,10 @@ def produce_minutes(csv_data, outputFile):
             if(k != n_bad_runs-1):
                 f.write(str(bad_runs[k]) + ', ')
             else:
-                f.write(str(bad_runs[k]) + '.\n')
+                if noDiff:
+                    f.write(str(bad_runs[k]) + '. ' + sameQuality + ' \n')
+                else:
+                    f.write(str(bad_runs[k]) + '.\n')
 
     if(n_lim_acc_runs != 0):
         f.write('Runs flagged as Limited acceptance (MC reproducible): ')
@@ -109,7 +128,10 @@ def produce_minutes(csv_data, outputFile):
             if(k != n_lim_acc_runs-1):
                 f.write(str(lim_acc_runs[k]) + ', ')
             else:
-                f.write(str(lim_acc_runs[k]) + '.\n')
+                if noDiff:
+                    f.write(str(lim_acc_runs[k]) + '. ' + sameQuality + ' \n')
+                else:
+                    f.write(str(lim_acc_runs[k]) + '.\n')
 
     f.write('\n')
 
@@ -125,6 +147,7 @@ parser.add_argument('--max_run', type=int, help='Maximum run number')
 parser.add_argument('--excluded_runs', type=int, nargs='*', default=[], help='List of run numbers to exclude')
 parser.add_argument('-b', '--batch', type=str, help='Path to CSV file for batch mode')
 parser.add_argument('--minutes', type=str, help='Name of the output file containing the minutes')
+parser.add_argument('--no_diff', action="store_true", help='Use this option if the non GOOD runs shows no difference wrt the previous pass')
 args = parser.parse_args()
 
 # Check for incompatible arguments
@@ -135,6 +158,13 @@ if args.batch:
 if not args.batch:
     if args.minutes:
         parser.error('--minutes can be used only in batch mode')
+    if args.no_diff:
+        parser.error('--no_diff can be used only in batch mode')
+
+if not args.minutes:
+    if args.no_diff:
+        parser.error('--no_diff can be used only if --minutes is used')
+
 # Load configuration from the specified JSON file
 config = load_config(args.config)
 
@@ -184,11 +214,13 @@ if args.batch:
     # Batch mode
     csv_data = read_csv_file(args.batch)
     for row in csv_data:
+        if(row["post"] != 'ok'):
+            continue
         run_number = row["run_number"]
         if run_number not in run_numbers:
             print(f"Error: Run number {run_number} not found.")
             continue
-        post_flag(run_number, row["flagTypeId"], row["comment"])
+        post_flag(run_number, row[args.data_pass], row['comment'])
 
     # create the minutes only in batch mode and if requested
     if(args.minutes):
@@ -198,7 +230,7 @@ if args.batch:
             f.write(args.data_pass)
             f.close()
         # write the minutes
-        produce_minutes(csv_data,outputFile)
+        produce_minutes(csv_data,outputFile,args.data_pass,args.no_diff)
 
 else:
     # Non-batch mode
