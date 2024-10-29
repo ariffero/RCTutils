@@ -220,7 +220,9 @@ if args.batch:
         if run_number not in run_numbers:
             print(f"Error: Run number {run_number} not found.")
             continue
-        post_flag(run_number, row[args.data_pass], row['comment'])
+        if(math.isnan(row['comment'])):
+            comment = " "
+        post_flag(run_number, row[args.data_pass], comment)
 
     # create the minutes only in batch mode and if requested
     if(args.minutes):
