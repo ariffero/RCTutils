@@ -78,9 +78,9 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
         
     for run in range (0, n_runs):  
         if(run != n_runs-1):
-            f.write(str(runs[run]) + ', ')
+            f.write(str(runs[run]).rstrip('.0') + ', ')
         else:
-            f.write(str(runs[run]) + '.\n')
+            f.write(str(runs[run]).rstrip('.0') + '.\n')
     
     sameQuality = 'The quality was the same in the previous pass.'
 
@@ -220,8 +220,11 @@ if args.batch:
         if run_number not in run_numbers:
             print(f"Error: Run number {run_number} not found.")
             continue
-        if(math.isnan(row['comment'])):
+        comment = ""
+        if(pd.isna(row['comment'])):
             comment = " "
+        else:
+            comment = row['comment']
         post_flag(run_number, row[args.data_pass], comment)
 
     # create the minutes only in batch mode and if requested
