@@ -1,0 +1,18 @@
+LHC24ao_apass1
+Runs: 558122, 558124, 558126, 55815, 558153, 558155, 558179, 558182, 558215, 558217.
+GOOD runs: 558122.
+Runs flagged as Bad tracking: 558124, 558182.
+Runs flagged as Limited acceptance (MC reproducible): 558126.
+Runs flagged as Limited acceptance (MC Not reproducible): 558150.
+Runs flagged as Bad PID: 558153, 558215.
+Runs flagged as Unknown: 558179.
+Runs flagged as No Detector Data: 558155, 558217.LHC24ao_apass1_skimmed
+Runs: 558482, 558535, 558551, 558606.
+GOOD runs: 558482, 558535, 558606.
+Runs flagged as Bad tracking: 558551. The quality was the same in the previous pass. 
+
+LHC24ao_apass1_skimmed
+Runs: 558221, 558244, 558247.
+GOOD runs: 558244.
+Runs flagged as Bad tracking: 558221, 558247. The quality was the same in the previous pass. 
+

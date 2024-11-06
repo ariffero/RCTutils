@@ -47,14 +47,22 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
     # number of runs of each quality
     n_runs = 0 # tot number of runs
     n_good_runs = 0
-    n_bad_runs = 0
+    n_bad_tracking = 0
     n_lim_acc_runs = 0
+    n_lim_acc_no_rep_runs = 0
+    n_bad_pid_runs = 0
+    n_no_det_data_runs = 0
+    n_unknown_runs = 0
 
     #list with the runs of each quality
     runs = list()
     good_runs = list()
-    bad_runs = list()
+    bad_tracking = list()
     lim_acc_runs = list()
+    lim_acc_no_rep_runs = list()
+    bad_pid_runs = list()
+    no_det_data_runs = list()
+    unknown_runs = list()
 
     # write all the analyzed runs and fill the lists
     f = open(outputFile, "a")
@@ -66,15 +74,34 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
         runs.append(run_number)
         n_runs = n_runs + 1
         print(run_number)
+        # good
         if(row[flagTypeIdPass]==9):
             n_good_runs = n_good_runs + 1
             good_runs.append(run_number)
+        # bad tracking
         if(row[flagTypeIdPass]==7):
-            n_bad_runs = n_bad_runs + 1
-            bad_runs.append(run_number)
+            n_bad_tracking = n_bad_tracking + 1
+            bad_tracking.append(run_number)
+        # lim acc (MC reproducible)
         if(row[flagTypeIdPass]==5):
             n_lim_acc_runs = n_lim_acc_runs + 1
             lim_acc_runs.append(run_number)
+        # lim acc (MC Not reproducible)
+        if(row[flagTypeIdPass]==4):
+            n_lim_acc_no_rep_runs = n_lim_acc_no_rep_runs + 1
+            lim_acc_no_rep_runs.append(run_number)
+        # bad pid
+        if(row[flagTypeIdPass]==6):
+            n_bad_pid_runs = n_bad_pid_runs + 1
+            bad_pid_runs.append(run_number)
+        # no detector data
+        if(row[flagTypeIdPass]==3):
+            n_no_det_data_runs = n_no_det_data_runs + 1
+            no_det_data_runs.append(run_number)
+        # unknown
+        if(row[flagTypeIdPass]==14):
+            n_unknown_runs = n_unknown_runs + 1
+            unknown_runs.append(run_number)
         
     for run in range (0, n_runs):  
         if(run != n_runs-1):
@@ -89,11 +116,11 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
         f.write("All the runs are GOOD.\n\n")
         return
 
-    elif(n_bad_runs==n_runs):
+    elif(n_bad_tracking==n_runs):
         if noDiff:
-            f.write("All the runs have been flagged as Bad tracking, due to huge part of the detector missing. " + sameQuality + "\n\n")
+            f.write("All the runs have been flagged as Bad tracking. " + sameQuality + "\n\n")
         else:
-            f.write("All the runs have been flagged as Bad tracking, due to huge part of the detector missing.\n\n")
+            f.write("All the runs have been flagged as Bad tracking.\n\n")
         return
 
     elif(n_lim_acc_runs==n_runs):
@@ -101,6 +128,28 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
             f.write("All the runs have been flagged as Limited acceptance (MC reproducible). " + sameQuality + ".\n\n")
         else:
             f.write("All the runs have been flagged as Limited acceptance (MC reproducible).\n\n")
+        return
+
+    elif(n_lim_acc_no_rep_runs==n_runs):
+        if noDiff:
+            f.write("All the runs have been flagged as Limited acceptance (MC Not reproducible). " + sameQuality + ".\n\n")
+        else:
+            f.write("All the runs have been flagged as Limited acceptance (MC Not reproducible).\n\n")
+        return
+
+    elif(n_bad_pid_runs==n_runs):
+        if noDiff:
+            f.write("All the runs have been flagged as Bad PID. " + sameQuality + ".\n\n")
+        else:
+            f.write("All the runs have been flagged as Bad PID.\n\n")
+        return
+
+    elif(n_no_det_data_runs==n_runs):
+        f.write("All the runs have been flagged as No Detector Data.\n\n")
+        return
+
+    elif(n_unknown_runs==n_runs):
+        f.write("All the runs have been flagged as Unknown.\n\n")
         return
 
     if(n_good_runs != 0):
@@ -111,16 +160,16 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
             else:
                 f.write(str(good_runs[k]) + '.\n')
 
-    if(n_bad_runs != 0):
+    if(n_bad_tracking != 0):
         f.write('Runs flagged as Bad tracking: ')
-        for k in range(0, n_bad_runs):
-            if(k != n_bad_runs-1):
-                f.write(str(bad_runs[k]) + ', ')
+        for k in range(0, n_bad_tracking):
+            if(k != n_bad_tracking-1):
+                f.write(str(bad_tracking[k]) + ', ')
             else:
                 if noDiff:
-                    f.write(str(bad_runs[k]) + '. ' + sameQuality + ' \n')
+                    f.write(str(bad_tracking[k]) + '. ' + sameQuality + ' \n')
                 else:
-                    f.write(str(bad_runs[k]) + '.\n')
+                    f.write(str(bad_tracking[k]) + '.\n')
 
     if(n_lim_acc_runs != 0):
         f.write('Runs flagged as Limited acceptance (MC reproducible): ')
@@ -132,6 +181,44 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
                     f.write(str(lim_acc_runs[k]) + '. ' + sameQuality + ' \n')
                 else:
                     f.write(str(lim_acc_runs[k]) + '.\n')
+
+    if(n_lim_acc_no_rep_runs != 0):
+        f.write('Runs flagged as Limited acceptance (MC Not reproducible): ')
+        for k in range(0, n_lim_acc_no_rep_runs):
+            if(k != n_lim_acc_no_rep_runs-1):
+                f.write(str(lim_acc_no_rep_runs[k]) + ', ')
+            else:
+                if noDiff:
+                    f.write(str(lim_acc_no_rep_runs[k]) + '. ' + sameQuality + ' \n')
+                else:
+                    f.write(str(lim_acc_no_rep_runs[k]) + '.\n')
+
+    if(n_bad_pid_runs != 0):
+        f.write('Runs flagged as Bad PID: ')
+        for k in range(0, n_bad_pid_runs):
+            if(k != n_bad_pid_runs-1):
+                f.write(str(bad_pid_runs[k]) + ', ')
+            else:
+                if noDiff:
+                    f.write(str(bad_pid_runs[k]) + '. ' + sameQuality + ' \n')
+                else:
+                    f.write(str(bad_pid_runs[k]) + '.\n')
+
+    if(n_unknown_runs != 0):
+        f.write('Runs flagged as Unknown: ')
+        for k in range(0, n_unknown_runs):
+            if(k != n_unknown_runs-1):
+                f.write(str(unknown_runs[k]) + ', ')
+            else:
+                f.write(str(unknown_runs[k]) + '.\n')
+
+    if(n_no_det_data_runs != 0):
+        f.write('Runs flagged as No Detector Data: ')
+        for k in range(0, n_no_det_data_runs):
+            if(k != n_no_det_data_runs-1):
+                f.write(str(no_det_data_runs[k]) + ', ')
+            else:
+                f.write(str(no_det_data_runs[k]) + '.\n')
 
     f.write('\n')
 
