@@ -189,12 +189,14 @@ for run in filtered_runs:
     if beam_type == "PROTON - PROTON":
         results.append({
             'run': run_number,
+            'beam_type': beam_type,
             'mu': an,  
             'inel': ao  
         })
     elif beam_type == "PB82 - PB82":
         results.append({
             'run': run_number,
+            'beam_type': beam_type,
             'zdcir': zdcir, 
             'zdcir_start': zdcir_start,
             'zdcir_mid': zdcir_mid,
