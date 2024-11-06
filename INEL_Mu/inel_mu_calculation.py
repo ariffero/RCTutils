@@ -98,7 +98,8 @@ for row in new_runs:
         'start_time_trigger': start_time_trigger,
         'end_time_trigger': end_time_trigger,
         'beam_type': row['lhcFill']['beamType'],
-        'beam_energy': rounded_energy  # Use the rounded beam energy
+        'beam_energy': rounded_energy,  # Use the rounded beam energy
+        'fill_number': row['lhcFill']["fillNumber"]
     })
 
 # Helper functions to mimic Excel formulas
@@ -113,6 +114,12 @@ def calculate_an(am, beam_type, beam_energy):
     # Retrieve the value for AN based on the beam type and energy
     energy_mapping = BEAM_ENERGY_MAPPING.get(beam_type, {})
     an_value = energy_mapping.get(str(beam_energy), 0.757)  # Default to 0.757 if not found
+
+    # Debug information
+    print(f"DEBUG: Calculating AN for beam type '{beam_type}' and energy '{beam_energy}'")
+    print(f"DEBUG: Energy mapping found: {energy_mapping}")
+    print(f"DEBUG: Using AN value: {an_value}")
+
     return am / an_value
 
 def calculate_ao(al, an):
@@ -123,11 +130,15 @@ def regex_extract(value, pattern):
     return int(match.group(1)) if match else 0
 
 # Function to extract relevant values according to process.sh logic
-def extract_values(run_number, time_trg_start):
-    cmd = f"./process.sh {run_number} {time_trg_start}"
+def extract_values(run_number, time_trg_start, beam_type, fill_number):
+    if beam_type == "PROTON - PROTON":
+        cmd = f"./process.sh {run_number} {time_trg_start}"
+    elif beam_type == "PB82 - PB82":
+        cmd = f"./process_pb.sh {run_number} {time_trg_start} {fill_number}"
     output = subprocess.check_output(cmd, shell=True, text=True)
     
-    ft0_vtx, o2_end, o2_start = None, None, None
+    ft0_vtx, o2_end, o2_start, zdcir, zdcir_start, zdcir_mid, zdcir_end = None, None, None, None, None, None, None
+
     
     for line in output.split("\n"):
         if "TRG=" in line:
@@ -136,8 +147,16 @@ def extract_values(run_number, time_trg_start):
             o2_start = float(line.split("TSstart=")[1].split()[0].strip())
         if "TSend=" in line:
             o2_end = float(line.split("TSend=")[1].split()[0].strip())
-    
-    return ft0_vtx, o2_end, o2_start
+        if "ZDCIR=" in line:
+            zdcir = float(line.split("ZDCIR=")[1].split()[0].strip())
+        if "ZDCIRstart=" in line:
+            zdcir_start = float(line.split("ZDCIRstart=")[1].split()[0].strip())
+        if "ZDCIRmid=" in line:
+            zdcir_mid = float(line.split("ZDCIRmid=")[1].split()[0].strip())
+        if "ZDCIRend=" in line:
+            zdcir_end = float(line.split("ZDCIRend=")[1].split()[0].strip())
+
+    return ft0_vtx, o2_end, o2_start, zdcir, zdcir_start, zdcir_mid, zdcir_end
 
 # Process the run data
 results = []
@@ -150,13 +169,13 @@ for run in filtered_runs:
     end_time_trigger = run['end_time_trigger']
     beam_type = run['beam_type']
     beam_energy = run['beam_energy']
-    
+    fill_number = run['fill_number']
     # Skip runs with None end_time_trigger
     if end_time_trigger is None:
         continue
     
     # Extract values using the process logic
-    ft0_vtx, o2_end, o2_start = extract_values(run_number, time_trg_start)
+    ft0_vtx, o2_end, o2_start, zdcir, zdcir_start, zdcir_mid, zdcir_end = extract_values(run_number, time_trg_start, beam_type, fill_number)
     
     # Use start_time_trigger and end_time_trigger directly in the calculation
     ai = calculate_ai(ft0_vtx, end_time_trigger, start_time_trigger)
@@ -165,11 +184,22 @@ for run in filtered_runs:
     an = calculate_an(am, beam_type, beam_energy)
     ao = calculate_ao(al, an)
 
-    results.append({
-        'run': run_number,
-        'mu': an,  # Assuming 'mu' corresponds to AN
-        'inel': ao  # Assuming 'inel' corresponds to AO
-    })
+    # Debug: Calculated values
+    print(f"DEBUG: Run {run_number}: AI = {ai}, AL = {al}, AM = {am}, AN = {an}, AO = {ao}")
+    if beam_type == "PROTON - PROTON":
+        results.append({
+            'run': run_number,
+            'mu': an,  
+            'inel': ao  
+        })
+    elif beam_type == "PB82 - PB82":
+        results.append({
+            'run': run_number,
+            'zdcir': zdcir, 
+            'zdcir_start': zdcir_start,
+            'zdcir_mid': zdcir_mid,
+            'zdcir_end': zdcir_end
+        })
 
 # Save the updated list of run numbers to the cache
 save_cache(current_runs)
