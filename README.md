@@ -46,7 +46,7 @@ python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24a_cpass0" --detect
 ```
 python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24al_cpass0" --detector "ITS" -b test.csv
 ```
-- It is possible to have in output a file that contains the minutes for the aQC meeting, based on the posted runs. To produce it use the argument `--minutes <name_of_the_file.txt>`, if the file is not present it will be generated and filled, otherwise the new info will be added to that file. If you are checking a run in a pass that is not `apass0` you may want to say explicitly that the quality of the run in the new pass is the same as in the previous pass, you can add this info to the minutes by adding the arguent `--no_diff`. At the moment this possibility is present only when using the script in batch mode. An example of the command to post the flags and obtain the minutes is:
+- It is possible to have in output a file that contains the minutes for the aQC meeting, based on the posted runs. To produce it use the argument `--minutes <name_of_the_file.txt>`, if the file is not present it will be generated and filled, otherwise the new info will be added to that file. If you are checking a run in a pass that is not `cpass0` you may want to say explicitly that the quality of the run in the new pass is the same as in the previous pass, you can add this info to the minutes by adding the arguent `--no_diff`. At the moment this possibility is present only when using the script in batch mode. An example of the command to post the flags and obtain the minutes is:
 ```
 python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24al_cpass0" --detector "ITS" -b test.csv --minutes minutes.txt --no_diff
 ```
