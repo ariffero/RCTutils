@@ -43,7 +43,7 @@ def read_csv_file(csv_file):
     return df.to_dict(orient='records')
 
 # function to produce the minutes for the aQC meeting
-def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
+def produce_minutes(csv_data, outputFile, flagTypeIdPass):
     # number of runs of each quality
     n_runs = 0 # tot number of runs
     n_good_runs = 0
@@ -73,7 +73,7 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
         run_number = row["run_number"]
         runs.append(run_number)
         n_runs = n_runs + 1
-        print(run_number)
+
         # good
         if(row[flagTypeIdPass]==9):
             n_good_runs = n_good_runs + 1
@@ -109,7 +109,13 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
         else:
             f.write(str(runs[run]).rstrip('.0') + '.\n')
     
-    sameQuality = 'The quality was the same in the previous pass.'
+    timeDepenent = ''
+    if args.time_dep:
+        timeDepenent = ' The quality is time dependent: the first part of the run(s) is GOOD.'
+
+    sameQuality = ''
+    if args.no_diff:
+        sameQuality = ' The quality was the same in the previous pass.'
 
     # write the minutes based on the values found in the csv
     if(n_good_runs==n_runs):
@@ -117,31 +123,19 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
         return
 
     elif(n_bad_tracking==n_runs):
-        if noDiff:
-            f.write("All the runs have been flagged as Bad tracking. " + sameQuality + "\n\n")
-        else:
-            f.write("All the runs have been flagged as Bad tracking.\n\n")
+        f.write("All the runs have been flagged as Bad tracking" + timeDepenent + sameQuality + "\n\n")
         return
 
     elif(n_lim_acc_runs==n_runs):
-        if noDiff:
-            f.write("All the runs have been flagged as Limited acceptance (MC reproducible). " + sameQuality + ".\n\n")
-        else:
-            f.write("All the runs have been flagged as Limited acceptance (MC reproducible).\n\n")
+        f.write("All the runs have been flagged as Limited acceptance (MC reproducible)" + timeDepenent + sameQuality + "\n\n")
         return
 
     elif(n_lim_acc_no_rep_runs==n_runs):
-        if noDiff:
-            f.write("All the runs have been flagged as Limited acceptance (MC Not reproducible). " + sameQuality + ".\n\n")
-        else:
-            f.write("All the runs have been flagged as Limited acceptance (MC Not reproducible).\n\n")
+        f.write("All the runs have been flagged as Limited acceptance (MC Not reproducible)" + timeDepenent + sameQuality + "\n\n")
         return
 
     elif(n_bad_pid_runs==n_runs):
-        if noDiff:
-            f.write("All the runs have been flagged as Bad PID. " + sameQuality + ".\n\n")
-        else:
-            f.write("All the runs have been flagged as Bad PID.\n\n")
+        f.write("All the runs have been flagged as Bad PID" + timeDepenent + sameQuality + "\n\n")
         return
 
     elif(n_no_det_data_runs==n_runs):
@@ -166,10 +160,7 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
             if(k != n_bad_tracking-1):
                 f.write(str(bad_tracking[k]) + ', ')
             else:
-                if noDiff:
-                    f.write(str(bad_tracking[k]) + '. ' + sameQuality + ' \n')
-                else:
-                    f.write(str(bad_tracking[k]) + '.\n')
+                f.write(str(bad_tracking[k]) + '.' + timeDepenent + sameQuality + '\n')
 
     if(n_lim_acc_runs != 0):
         f.write('Runs flagged as Limited acceptance (MC reproducible): ')
@@ -177,10 +168,7 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
             if(k != n_lim_acc_runs-1):
                 f.write(str(lim_acc_runs[k]) + ', ')
             else:
-                if noDiff:
-                    f.write(str(lim_acc_runs[k]) + '. ' + sameQuality + ' \n')
-                else:
-                    f.write(str(lim_acc_runs[k]) + '.\n')
+                f.write(str(lim_acc_runs[k]) + '.' + timeDepenent + sameQuality + '\n')
 
     if(n_lim_acc_no_rep_runs != 0):
         f.write('Runs flagged as Limited acceptance (MC Not reproducible): ')
@@ -188,10 +176,7 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
             if(k != n_lim_acc_no_rep_runs-1):
                 f.write(str(lim_acc_no_rep_runs[k]) + ', ')
             else:
-                if noDiff:
-                    f.write(str(lim_acc_no_rep_runs[k]) + '. ' + sameQuality + ' \n')
-                else:
-                    f.write(str(lim_acc_no_rep_runs[k]) + '.\n')
+                f.write(str(lim_acc_no_rep_runs[k]) + '.' + timeDepenent + sameQuality + '\n')
 
     if(n_bad_pid_runs != 0):
         f.write('Runs flagged as Bad PID: ')
@@ -199,10 +184,7 @@ def produce_minutes(csv_data, outputFile, flagTypeIdPass, noDiff):
             if(k != n_bad_pid_runs-1):
                 f.write(str(bad_pid_runs[k]) + ', ')
             else:
-                if noDiff:
-                    f.write(str(bad_pid_runs[k]) + '. ' + sameQuality + ' \n')
-                else:
-                    f.write(str(bad_pid_runs[k]) + '.\n')
+                f.write(str(bad_pid_runs[k]) + '.' + timeDepenent + sameQuality + '\n')
 
     if(n_unknown_runs != 0):
         f.write('Runs flagged as Unknown: ')
@@ -235,6 +217,7 @@ parser.add_argument('--excluded_runs', type=int, nargs='*', default=[], help='Li
 parser.add_argument('-b', '--batch', type=str, help='Path to CSV file for batch mode')
 parser.add_argument('--minutes', type=str, help='Name of the output file containing the minutes')
 parser.add_argument('--no_diff', action="store_true", help='Use this option if the non GOOD runs shows no difference wrt the previous pass')
+parser.add_argument('--time_dep', action="store_true", help='Mark the non GOOD runs as time dependent, the quality will need to be posted manually, but the runs are considered in the minutes')
 args = parser.parse_args()
 
 # Check for incompatible arguments
@@ -247,10 +230,14 @@ if not args.batch:
         parser.error('--minutes can be used only in batch mode')
     if args.no_diff:
         parser.error('--no_diff can be used only in batch mode')
+    if args.time_dep:
+        parser.error('--time_dep can be used only in batch mode')
 
 if not args.minutes:
     if args.no_diff:
         parser.error('--no_diff can be used only if --minutes is used')
+    if args.time_dep:
+        parser.error('--time_dep can be used only if --minutes is used')
 
 # Load configuration from the specified JSON file
 config = load_config(args.config)
@@ -303,16 +290,28 @@ if args.batch:
     for row in csv_data:
         if(row["post"] != 'ok'):
             continue
+
         run_number = row["run_number"]
         if run_number not in run_numbers:
             print(f"Error: Run number {run_number} not found.")
             continue
+
         comment = ""
         if(pd.isna(row['comment'])):
             comment = " "
         else:
             comment = row['comment']
-        post_flag(run_number, row[args.data_pass], comment)
+
+        quality = row[args.data_pass]
+        if args.time_dep:
+            if quality==9:
+                print(run_number)
+                post_flag(run_number, quality, comment)
+            else:
+                print(str(run_number)+' not posted!')
+        else:
+            print(run_number)
+            post_flag(run_number, quality, comment)
 
     # create the minutes only in batch mode and if requested
     if(args.minutes):
@@ -322,7 +321,7 @@ if args.batch:
             f.write(args.data_pass)
             f.close()
         # write the minutes
-        produce_minutes(csv_data,outputFile,args.data_pass,args.no_diff)
+        produce_minutes(csv_data,outputFile,args.data_pass)
 
 else:
     # Non-batch mode
