@@ -50,6 +50,7 @@ python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24al_cpass0" --detec
 ```
 python3 rct_post_flag.py rct_post_flag.json --data_pass "LHC24al_cpass0" --detector "ITS" -b test.csv --minutes minutes.txt --no_diff
 ```
+- If the quality of the non-GOOD runs is time-dependent (i.e. it is GOOD until a problem occur and bad/limited acceptance later) you need to post the flag on the RCT by hand. You can use the option `--time_dep` to mark all the non-GOOD runs as time-dependent, in this way they will be considered with this flag in the minutes, but the corresponding flags will not be posted. Of course, the usage of the option `--minutes` is compulsory to use this option.
 ## Verifying multi-runs in RCT
 Both the latest run-based and time-dependent flags for each run can be verified with this script. Put your Bookkeeping token to the json configuration file. The `--comment`, `--max_run`, `--min_run` and `--excluded_runs` are optional. If `--max_run` and `--min_run` are omitted, all runs from the pass will be verified. Add your BK token to the configuration json file. **This script is not well tested. Suggest verifying the time-dependent flags by hand.** 
 - Example command:
