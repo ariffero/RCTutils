@@ -216,7 +216,7 @@ parser.add_argument('--max_run', type=int, help='Maximum run number')
 parser.add_argument('--excluded_runs', type=int, nargs='*', default=[], help='List of run numbers to exclude')
 parser.add_argument('-b', '--batch', type=str, help='Path to CSV file for batch mode')
 parser.add_argument('--minutes', type=str, help='Name of the output file containing the minutes')
-parser.add_argument('--no_diff', action="store_true", help='Use this option if the non GOOD runs shows no difference wrt the previous pass')
+parser.add_argument('--no_diff', action="store_true", help='Use this option if the non GOOD runs show no difference wrt the previous pass')
 parser.add_argument('--time_dep', action="store_true", help='Mark the non GOOD runs as time dependent, the quality will need to be posted manually, but the runs are considered in the minutes')
 args = parser.parse_args()
 
