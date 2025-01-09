@@ -32,10 +32,11 @@ def fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, to
     """
     url = f"{flag_api_url}?dataPassId={data_pass_id}&runNumber={run_number}&dplDetectorId={detector_id}&token={token}"
     response = requests.get(url, verify=False)
-    if response.status_code != 200:
-        raise ValueError(f"Failed to fetch data: {response.status_code} {response.reason}")
     
     flags = response.json().get('data', [])
+    if not flags:
+        return ["Not Available"]
+
     return [flag for flag in flags if flag.get("effectivePeriods")]
 
 def format_flags(flags):
