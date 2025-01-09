@@ -27,24 +27,16 @@ def fetch_runs(api_base_url, data_pass_id, token):
     return runs
 
 def fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, token):
-    """Fetches quality flags for a specific detector and run."""
+    """
+    Fetches and filters detector flags with valid effective periods.
+    """
     url = f"{flag_api_url}?dataPassId={data_pass_id}&runNumber={run_number}&dplDetectorId={detector_id}&token={token}"
     response = requests.get(url, verify=False)
-    data = response.json()
-    flags = data.get('data', [])
+    if response.status_code != 200:
+        raise ValueError(f"Failed to fetch data: {response.status_code} {response.reason}")
     
-    if not flags:
-        return ["Not Available"]
-
-    # Sort flags by 'updatedAt' timestamp
-    flags.sort(key=lambda x: x['updatedAt'])
-
-    intervals = {}
-    for flag in flags:
-        key = (flag['from'], flag['to'])
-        intervals[key] = flag  # Keep only the latest flag for each interval
-
-    return list(intervals.values())
+    flags = response.json().get('data', [])
+    return [flag for flag in flags if flag.get("effectivePeriods")]
 
 def format_flags(flags):
     """Formats the flags for CSV output."""
