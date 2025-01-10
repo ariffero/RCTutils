@@ -1,0 +1,68 @@
+{
+    "period": "LHC24af",
+    "pass": "apass1_skimmed",
+    "sheets": [
+        {
+            "runlists": [
+                {
+                    "name": "CBT",
+                    "detectors": {
+                        "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
+                        "TPC": ["Good", "LimitedAcceptanceMCReproducible"],
+                        "FT0": ["Good", "LimitedAcceptanceMCReproducible"]
+                    }
+                },
+                {
+                    "name": "CBT_hadronPID",
+                    "detectors": {
+                        "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
+                        "TPC": ["Good", "LimitedAcceptanceMCReproducible"],
+                        "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
+		                "TOF": ["Good", "LimitedAcceptanceMCReproducible"]
+                    }
+                },
+                    {
+                        "name": "CBT_electronPID",
+                        "detectors": {
+                            "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "TPC": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "TOF": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "TRD": ["Good", "LimitedAcceptanceMCReproducible"]
+                        }
+                    },
+                    {
+                        "name": "CBT_calo",
+                        "detectors": {
+                            "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "TPC": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "EMC": ["Good", "LimitedAcceptanceMCReproducible"]
+                        }
+                    },
+                    {
+                        "name": "CBT_muon",
+                        "detectors": {
+                            "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "TPC": ["Good", "LimitedAcceptanceMCReproducible", "BadPID"],
+                            "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "MCH": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "MID": ["Good", "LimitedAcceptanceMCReproducible"]
+                        }
+                    },
+                    {
+                        "name": "CBT_muon_global",
+                        "detectors": {
+                            "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "TPC": ["Good", "LimitedAcceptanceMCReproducible", "BadPID"],
+                            "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "MCH": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "MID": ["Good", "LimitedAcceptanceMCReproducible"],
+                            "MFT": ["Good", "LimitedAcceptanceMCReproducible"]
+                        }
+                    }
+            ]
+        }
+    ]
+}
+
