@@ -9,7 +9,8 @@
                     "detectors": {
                         "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
                         "TPC": ["Good", "LimitedAcceptanceMCReproducible"],
-                        "FT0": ["Good", "LimitedAcceptanceMCReproducible"]
+                        "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
+			"ZDC": ["Good", "LimitedAcceptanceMCReproducible"]
                     }
                 },
                 {
@@ -18,7 +19,8 @@
                         "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
                         "TPC": ["Good", "LimitedAcceptanceMCReproducible"],
                         "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
-		                "TOF": ["Good", "LimitedAcceptanceMCReproducible"]
+			"ZDC": ["Good", "LimitedAcceptanceMCReproducible"],
+		        "TOF": ["Good", "LimitedAcceptanceMCReproducible"]
                     }
                 },
                     {
@@ -27,6 +29,7 @@
                             "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
                             "TPC": ["Good", "LimitedAcceptanceMCReproducible"],
                             "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
+			    "ZDC": ["Good", "LimitedAcceptanceMCReproducible"],
                             "TOF": ["Good", "LimitedAcceptanceMCReproducible"],
                             "TRD": ["Good", "LimitedAcceptanceMCReproducible"]
                         }
@@ -37,6 +40,7 @@
                             "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
                             "TPC": ["Good", "LimitedAcceptanceMCReproducible"],
                             "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
+			    "ZDC": ["Good", "LimitedAcceptanceMCReproducible"],
                             "EMC": ["Good", "LimitedAcceptanceMCReproducible"]
                         }
                     },
@@ -46,6 +50,7 @@
                             "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
                             "TPC": ["Good", "LimitedAcceptanceMCReproducible", "BadPID"],
                             "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
+			    "ZDC": ["Good", "LimitedAcceptanceMCReproducible"],
                             "MCH": ["Good", "LimitedAcceptanceMCReproducible"],
                             "MID": ["Good", "LimitedAcceptanceMCReproducible"]
                         }
@@ -56,6 +61,7 @@
                             "ITS": ["Good", "LimitedAcceptanceMCReproducible"],
                             "TPC": ["Good", "LimitedAcceptanceMCReproducible", "BadPID"],
                             "FT0": ["Good", "LimitedAcceptanceMCReproducible"],
+			    "ZDC": ["Good", "LimitedAcceptanceMCReproducible"],
                             "MCH": ["Good", "LimitedAcceptanceMCReproducible"],
                             "MID": ["Good", "LimitedAcceptanceMCReproducible"],
                             "MFT": ["Good", "LimitedAcceptanceMCReproducible"]
