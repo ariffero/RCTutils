@@ -31,7 +31,7 @@ The range of runs can be set in this configration file by the "run_range" for ea
 ## Produce run lists from RCT
 - Produce the .csv files mentioned in **Export runs from RCT (in Bookkeeping)** 
 - Example configuration file: rct_runlist.json. Modify it according to your needs
-- `python3 rct_runlist.py rct_runlist.json -d csv_file_path`. The `-d` can be omitted if the .csv files are already in the current directory 
+- `python3 rct_runlist.py rct_runlist.json -d csv_file_path`. The `-d` can be omitted if the .csv files are already in the current directory. Add `--convert-time` if you want to save the timestamps in human-readable format. 
 ## Calculate and upload mu/INEL rate to RCT
 The scritps needed and the example configuration files can be found under `INEL_Mu`. 
 - `python3 inel_mu_calculation.py mu_inel.json` 
