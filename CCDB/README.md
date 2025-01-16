@@ -2,6 +2,7 @@
 
 This repository contains utilities to create and manage CCDB objects based on RCT flags. It includes functionality to process CSV files with RCT flags, encode them into bitmasks, upload them to CCDB, and retrieve the stored objects.
 
+---
 ## Flag-to-Bit Mapping
 
 The flag-to-bit mapping is defined in the `process_and_upload.C` file. It assigns specific bits in a 32-bit word for each detector, representing its data quality status. Each detector can have one or more flags, including both general and specific ones. The `"Bad"` flag is used as a general indicator for issue, but it may be triggered by different underlying reasons depending on the detector.
@@ -47,8 +48,58 @@ std::map<std::string, std::map<std::string, int>> detailedBitMapping = {
   - `"ITS"` treats `"BadTracking"` and `"UnknownQuality"` as reasons for `"Bad"` (**bit 7**).
   - `"TPC"` handles `"BadTracking"`, `"BadPID"`, and `"LimitedAcceptanceMCNotReproducible"` with distinct bits (**18**, **19**, **20**).
 
----
+### Explanation of the Encoded Flag Format
 
+The encoded flag format represents the data quality status of multiple detectors using a 32-bit integer. Each bit in the bitmask corresponds to a specific detector or condition.
+
+#### Format:
+- **Bit Position**: Each bit in the 32-bit integer maps to a specific detector or condition.
+- **Bit Status**:
+  - `1`: Indicates a "Bad" status or a specific issue for the corresponding detector.
+  - `0`: Indicates a "Good" status with no issues detected for the corresponding detector.
+- **Time Range**: Each bitmask is valid for a specific time range within the run.
+  - **Start Timestamp (`from`)**: Indicates when this bitmask becomes valid.
+  - **End Timestamp (`to`)**: Implicitly defined as the start timestamp of the next entry in the vector or the end of the run for the last entry.
+
+#### Example:
+For a given time range:
+- **Start Timestamp (`from`)**: `1724039848000`.
+- **Bitmask**: `0b00000000000000001000000000000010`.
+
+This bitmask indicates:
+- **EMC** (bit 1): Bad quality.
+- **PHS** (bit 15): Bad quality.
+- All other detectors are in "Good" status (`0`).
+
+If there is another entry:
+- **Next Timestamp (`from`)**: `1724040959000`.
+- The time range for the first entry is implicitly `1724039848000` to `1724040959000`.
+
+
+### CCDB Object Format
+
+The encoded flags are stored in the CCDB as a vector of timestamped bitmasks, providing a detailed and chronological record of detector quality.
+
+#### Structure:
+The CCDB object is a `std::vector<std::pair<int64_t, int32_t>>`, where:
+- **`int64_t`**: Represents the start timestamp (`from`) of a time range.
+- **`int32_t`**: Represents the 32-bit encoded flag for that time range.
+
+#### Time Range Interpretation:
+- Each pair only stores the **start timestamp (`from`)**.
+- The **end timestamp (`to`)** is implicitly defined as:
+  - The next timestamp in the vector for all but the last entry.
+  - The end of the run for the final entry.
+
+#### Example:
+For a specific run:
+```cpp
+std::vector<std::pair<int64_t, int32_t>> encodedFlags = {
+    {1724039848000, 0b00000000000000001000000000000010}, // Time range: 1724039848000 to 1724040959000
+    {1724040959000, 0b00000000000000000000000000000000}, // Time range: 1724040959000 to end of run
+};
+```
+---
 ## Contents
 
 - **process_and_upload.C**: 
@@ -73,8 +124,6 @@ std::map<std::string, std::map<std::string, int>> detailedBitMapping = {
 - Ensure you have access to the ALICE CCDB infrastructure (`http://alice-ccdb.cern.ch`).
 - The `dict_ccdb.so` file must be in the working directory to enable CCDB object handling.
 - O2/ROOT framework should be installed and configured.
-
----
 
 ### 1. Encoding and Uploading RCT Flags to CCDB
 
