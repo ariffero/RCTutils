@@ -29,7 +29,7 @@ void process_and_upload(const char* csvFilePath,const char* passName, const char
     std::map<std::string, std::map<std::string, int>> detailedBitMapping = {
         {"CPV", { {"Bad", 0}, {"Invalid", 0} }},
         {"EMC", { {"Bad", 1}, {"NoDetectorData", 1}, {"BadEMCalorimetry", 1}, {"LimitedAcceptanceMCReproducible", 2} }},
-        {"FDD", { {"Bad", 3}, {"NoDetectorData", 3} }},
+        {"FDD", { {"Bad", 3}, {"Invalid", 3}, {"NoDetectorData", 3} }},
         {"FT0", { {"Bad", 4}, {"UnknownQuality", 4}, {"Unknown", 4} }},
         {"FV0", { {"Bad", 5} }},
         {"HMP", { {"Bad", 6}, {"NoDetectorData", 6} }},
