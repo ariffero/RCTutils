@@ -148,8 +148,7 @@ root -b -q 'read_encoded_flags.C(555651, "apass1", "LHC24am", "Users/j/jian/RCT"
 ```
 ### 3. Error Handling
 - Unexpected Flags:
-
-Detected unexpected flags are treated as "Bad" and logged in a file named unexpected_flags_YYYYMMDD_HHMMSS.log.
+detected unexpected flags are treated as "Bad" and logged in a file named unexpected_flags_YYYYMMDD_HHMMSS.log.
 
 
 
