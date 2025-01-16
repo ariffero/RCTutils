@@ -7,7 +7,7 @@
 #include "CCDB/BasicCCDBManager.h"
 #endif
 
-void read_encoded_flags(int run, const char* passName, const char* periodName, const char* ccdbPath = "Users/j/jian/meanT0M") {
+void read_encoded_flags(int run, const char* passName, const char* periodName, const char* ccdbPath = "Users/j/jian/RCT") {
     // Get the CCDB manager instance
     auto& ccdb = o2::ccdb::BasicCCDBManager::instance();
 
