@@ -128,7 +128,7 @@ std::vector<std::pair<int64_t, int32_t>> encodedFlags = {
 ### 1. Encoding and Uploading RCT Flags to CCDB
 
 #### Input:
-- A CSV file containing RCT flags for various detectors.
+- A CSV file containing RCT flags for various detectors. The file can be created following [this instruction](https://github.com/JianLIUhep/RCTutils/tree/main?tab=readme-ov-file#export-runs-from-rct-in-bookkeeping).
 
 #### Command:
 ```
