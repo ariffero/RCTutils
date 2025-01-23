@@ -122,9 +122,14 @@ std::map<uint64_t, uint32_t> encodedFlags = {
 ### Prerequisites
 
 - Ensure you have access to the ALICE CCDB infrastructure (`http://alice-ccdb.cern.ch`).
-- The `dict_ccdb.so` file must be in the working directory to enable CCDB object handling.
+- The `dict_ccdb.so and dict_ccdb_rdict.pcm` files must be in the working directory to enable CCDB object handling.
+- Create the dictionary file  1455  rootcling -f dict_ccdb.cxx -c dict_ccdb.h
 - O2/ROOT framework should be installed and configured.
-
+- If the pre-created dictionary files do not work, the dictionary files can be created with your ROOT: 
+```
+rootcling -f dict_ccdb.cxx -c dict_ccdb.h
+g++ -shared -fPIC dict_ccdb.cxx -o dict_ccdb.so $(root-config --cflags --libs)
+```
 ### 1. Encoding and Uploading RCT Flags to CCDB
 
 #### Input:
