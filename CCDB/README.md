@@ -81,9 +81,9 @@ If there is another entry:
 The encoded flags are stored in the CCDB as a vector of timestamped bitmasks, providing a detailed and chronological record of detector quality.
 
 #### Structure:
-The CCDB object is a `std::vector<std::pair<int64_t, int32_t>>`, where:
-- **`int64_t`**: Represents the start timestamp (`from`) of a time range.
-- **`int32_t`**: Represents the 32-bit encoded flag for that time range.
+The CCDB object is a `std::map<uint64_t, uint32_t>`, where:
+- **`uint64_t`**: Represents the start timestamp (`from`) of a time range.
+- **`uint32_t`**: Represents the 32-bit encoded flag for that time range.
 
 #### Time Range Interpretation:
 - Each pair only stores the **start timestamp (`from`)**.
@@ -94,7 +94,7 @@ The CCDB object is a `std::vector<std::pair<int64_t, int32_t>>`, where:
 #### Example:
 For a specific run:
 ```cpp
-std::vector<std::pair<int64_t, int32_t>> encodedFlags = {
+std::map<uint64_t, uint32_t> encodedFlags = {
     {1724039848000, 0b00000000000000001000000000000010}, // Time range: 1724039848000 to 1724040959000
     {1724040959000, 0b00000000000000000000000000000000}, // Time range: 1724040959000 to end of run
 };
@@ -144,7 +144,7 @@ root -b -q 'read_encoded_flags.C(runNumber, "passName", "periodName", "YourCCDBP
 ```
 #### Example: 
 ``` 
-root -b -q 'read_encoded_flags.C(555651, "apass1", "LHC24am", "Users/j/jian/RCT")'
+root -b -q 'read_encoded_flags.C(555651, "apass1_apass1", "LHC24am", "Users/j/jian/RCT")'
 ```
 ### 3. Error Handling
 - Unexpected Flags:
