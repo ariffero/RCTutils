@@ -144,7 +144,7 @@ root -b -q 'read_encoded_flags.C(runNumber, "passName", "periodName", "YourCCDBP
 ```
 #### Example: 
 ``` 
-root -b -q 'read_encoded_flags.C(555651, "apass1_apass1", "LHC24am", "Users/j/jian/RCT")'
+root -b -q 'read_encoded_flags.C(555651, "apass1_skimmed", "LHC24am", "Users/j/jian/RCT")'
 ```
 ### 3. Error Handling
 - Unexpected Flags:
