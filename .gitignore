@@ -3,7 +3,6 @@
 
 #ignore the file from the compilation
 *.d
-*.pcm
 
 # ignore ALL files in ANY directory named temp
 # comment below to not implement

@@ -109,8 +109,8 @@ std::map<uint64_t, uint32_t> encodedFlags = {
 - **read_encoded_flags.C**: 
   - Reads and decodes the encoded flags from CCDB for a given run number and metadata.
 
-- **dict_ccdb.so**: 
-  - A dictionary file for CCDB interactions, required to handle RCT CCDB objects.
+- **dict_ccdb.so, dict_ccdb_rdict.pcm**: 
+  - ROOT dictionary files for CCDB interactions, required to handle RCT CCDB objects.
 
 - **README.md**: 
   - Documentation for the repository.
