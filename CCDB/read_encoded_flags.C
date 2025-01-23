@@ -1,6 +1,5 @@
 #include <map>
 #include <string>
-#include <vector>
 #include <utility>
 #include <iostream>
 #if !defined(__CLING__) || defined(__ROOTCLING__)
@@ -8,6 +7,12 @@
 #endif
 
 void read_encoded_flags(int run, const char* passName, const char* periodName, const char* ccdbPath = "Users/j/jian/RCT") {
+    // Load the dictionary
+    if (gSystem->Load("dict_ccdb.so") < 0) {
+        std::cerr << "Error: Failed to load dict_ccdb.so" << std::endl;
+        return;
+    }
+
     // Get the CCDB manager instance
     auto& ccdb = o2::ccdb::BasicCCDBManager::instance();
 
@@ -23,7 +28,7 @@ void read_encoded_flags(int run, const char* passName, const char* periodName, c
 
     // Retrieve the encoded flags
     try {
-        auto encodedFlags = ccdb.getSpecific<std::vector<std::pair<int64_t, int32_t>>>(ccdbPath, ts, metadata);
+        auto encodedFlags = ccdb.getSpecific<std::map<uint64_t, uint32_t>>(ccdbPath, ts, metadata);
 
         // Check if the object was successfully retrieved
         if (!encodedFlags) {

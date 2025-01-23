@@ -20,12 +20,13 @@ std::string getErrorLogFilename() {
     return std::string(buffer);
 }
 
-void process_and_upload(const char* csvFilePath,const char* passName, const char* periodName, const char* ccdbPath) {
+void process_and_upload(const char* csvFilePath, const char* passName, const char* periodName, const char* ccdbPath) {
     // Load the dictionary
     if (gSystem->Load("dict_ccdb.so") < 0) {
         std::cerr << "Error: Failed to load dict_ccdb.so" << std::endl;
         return;
     }
+
     std::map<std::string, std::map<std::string, int>> detailedBitMapping = {
         {"CPV", { {"Bad", 0}, {"Invalid", 0} }},
         {"EMC", { {"Bad", 1}, {"NoDetectorData", 1}, {"BadEMCalorimetry", 1}, {"LimitedAcceptanceMCReproducible", 2} }},
@@ -135,8 +136,8 @@ void process_and_upload(const char* csvFilePath,const char* passName, const char
             }
         }
 
-        std::map<int64_t, int32_t> encodedFlags;
-        std::set<int64_t> timePoints;
+        std::map<uint64_t, uint32_t> encodedFlags;
+        std::set<uint64_t> timePoints;
 
         for (const auto& [detector, ranges] : timeRanges) {
             for (const auto& range : ranges) {
@@ -145,12 +146,12 @@ void process_and_upload(const char* csvFilePath,const char* passName, const char
             }
         }
 
-        std::vector<int64_t> sortedTimePoints(timePoints.begin(), timePoints.end());
+        std::vector<uint64_t> sortedTimePoints(timePoints.begin(), timePoints.end());
 
         for (size_t i = 0; i < sortedTimePoints.size() - 1; ++i) {
-            int64_t fromTimestamp = sortedTimePoints[i];
-            int64_t toTimestamp = sortedTimePoints[i + 1];
-            int32_t encodedWord = 0;
+            uint64_t fromTimestamp = sortedTimePoints[i];
+            uint64_t toTimestamp = sortedTimePoints[i + 1];
+            uint32_t encodedWord = 0;
 
             for (const auto& [detector, ranges] : flagNames) {
                 for (const auto& [flagName, range] : ranges) {
@@ -173,10 +174,8 @@ void process_and_upload(const char* csvFilePath,const char* passName, const char
             encodedFlags[fromTimestamp] = encodedWord;
         }
 
-        std::vector<std::pair<int64_t, int32_t>> encodedVector(encodedFlags.begin(), encodedFlags.end());
-
-        std::cout << "Encoded Vector for Run " << runNumber << ":\n";
-        for (const auto& [timestamp, bitmask] : encodedVector) {
+        std::cout << "Encoded Map for Run " << runNumber << ":\n";
+        for (const auto& [timestamp, bitmask] : encodedFlags) {
             std::cout << "  Timestamp: " << timestamp
                       << ", Bitmask: " << std::bitset<32>(bitmask) << " (" << bitmask << ")\n";
         }
@@ -190,7 +189,7 @@ void process_and_upload(const char* csvFilePath,const char* passName, const char
         auto sor = soreor.first;
         auto eor = soreor.second;
 
-        ccdb.storeAsTFileAny(&encodedVector, ccdbPath, metadata, sor - 10000, eor + 10000);
+        ccdb.storeAsTFileAny(&encodedFlags, ccdbPath, metadata, sor - 10000, eor + 10000);
         std::cout << "Successfully uploaded encoded flags for run " << runNumber << " to CCDB.\n";
     }
 
