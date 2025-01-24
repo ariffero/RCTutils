@@ -6,7 +6,7 @@
 #include "CCDB/BasicCCDBManager.h"
 #endif
 
-void read_encoded_flags(int run, const char* passName, const char* periodName, const char* ccdbPath = "Users/j/jian/RCT") {
+void read_encoded_flags(int run, const char* passName, const char* periodName, int versionNumber, const char* ccdbPath = "Users/j/jian/RCT") {
     // Load the dictionary
     if (gSystem->Load("dict_ccdb.so") < 0) {
         std::cerr << "Error: Failed to load dict_ccdb.so" << std::endl;
@@ -25,6 +25,7 @@ void read_encoded_flags(int run, const char* passName, const char* periodName, c
     metadata["run"] = std::to_string(run);
     metadata["passName"] = passName;
     metadata["periodName"] = periodName;
+    metadata["version"] = std::to_string(versionNumber);
 
     // Retrieve the encoded flags
     try {

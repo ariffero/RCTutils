@@ -20,7 +20,7 @@ std::string getErrorLogFilename() {
     return std::string(buffer);
 }
 
-void process_and_upload(const char* csvFilePath, const char* passName, const char* periodName, const char* ccdbPath) {
+void process_and_upload(const char* csvFilePath, const char* passName, const char* periodName, const char* versionNumber, const char* ccdbPath) {
     // Load the dictionary
     if (gSystem->Load("dict_ccdb.so") < 0) {
         std::cerr << "Error: Failed to load dict_ccdb.so" << std::endl;
@@ -184,8 +184,9 @@ void process_and_upload(const char* csvFilePath, const char* passName, const cha
         metadata["run"] = runNumber;
         metadata["passName"] = passName;
         metadata["periodName"] = periodName;
+        metadata["version"] = versionNumber; 
 
-        auto soreor = o2::ccdb::BasicCCDBManager::getRunDuration(ccdb, std::stoi(runNumber));
+	auto soreor = o2::ccdb::BasicCCDBManager::getRunDuration(ccdb, std::stoi(runNumber));
         auto sor = soreor.first;
         auto eor = soreor.second;
 

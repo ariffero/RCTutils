@@ -137,7 +137,7 @@ g++ -shared -fPIC dict_ccdb.cxx -o dict_ccdb.so $(root-config --cflags --libs)
 
 #### Command:
 ```
-root -b -q 'process_and_upload.C("path/to/input.csv", "passName", "periodName", "YourCCDBPath")'
+root -b -q 'process_and_upload.C("path/to/input.csv", "passName", "periodName", "versionNumber",  "YourCCDBPath")'
 ```
 ### 2. Reading Encoded Flags from CCDB
 
@@ -145,11 +145,11 @@ root -b -q 'process_and_upload.C("path/to/input.csv", "passName", "periodName", 
 - Metadata: Run number, pass name and period name
 #### Command: 
 ``` 
-root -b -q 'read_encoded_flags.C(runNumber, "passName", "periodName", "YourCCDBPath")'
+root -b -q 'read_encoded_flags.C(runNumber, "passName", "periodName", versionNumber, "YourCCDBPath")'
 ```
 #### Example: 
 ``` 
-root -b -q 'read_encoded_flags.C(555651, "apass1_skimmed", "LHC24am", "Users/j/jian/RCT")'
+root -b -q 'read_encoded_flags.C(555651, "apass1_skimmed", "LHC24am", 0,  "Users/j/jian/RCT")'
 ```
 ### 3. Error Handling
 - Unexpected Flags:
