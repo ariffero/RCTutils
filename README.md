@@ -66,3 +66,6 @@ navigate to the settings (3-dot icon on the left) -> open the `Developer Tools`,
 type `sessionService.session.token`, and press Enter to produce the token.
 
 **The token expires in 1 week! One needs to reproduce it regularly.** 
+
+## Macros for the MID
+- `merge-csv.py` is used to merge the csv downloaded with `rct.py`. Put all the csv that you want to merge in a folder, anche change the name of `file_name` to the name of the folder. The script will produce 3 files, one with all the runs and the quality of the MID, one with good runs, one with Bad Tracking runs, and one with Limited Acceptance (MC rep) runs.
