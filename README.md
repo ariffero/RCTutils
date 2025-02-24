@@ -69,3 +69,4 @@ type `sessionService.session.token`, and press Enter to produce the token.
 
 ## Macros for the MID
 - `merge-csv.py` is used to merge the csv downloaded with `rct.py`. Put all the csv that you want to merge in a folder, anche change the name of `file_name` to the name of the folder. The script will produce 3 files, one with all the runs and the quality of the MID, one with good runs, one with Bad Tracking runs, and one with Limited Acceptance (MC rep) runs.
+- `merge-quality.py` it reads the output with the quality of all the runs created with `merge-csv.py` and other txt files that contains the quality of data/MC comparison using different criteria and produces a file with the run number and all the flags. Change the value of `period` and put it as the name of the folder that contains the csv from `merge-csv.py`. The other txt files need to be in a folder called `data-MC-quality` inside the folder with the csv files.
