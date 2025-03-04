@@ -22,11 +22,14 @@ std::string getErrorLogFilename() {
     return std::string(buffer);
 }
 
+// The function now accepts an extra boolean parameter treatNotAvailableAsGood.
+// "Not present" is always treated as bad, while "Not Available" is treated based on the flag.
 void process_and_upload(const char* csvFilePath,
                         const char* passName,
                         const char* periodName,
                         const char* versionNumber,
-                        const char* ccdbPath) {
+                        const char* ccdbPath,
+                        bool treatNotAvailableAsGood = false) {
     // Load the CCDB dictionary.
     if (gSystem->Load("dict_ccdb.so") < 0) {
         std::cerr << "Error: Failed to load dict_ccdb.so" << std::endl;
@@ -121,8 +124,16 @@ void process_and_upload(const char* csvFilePath,
             std::string detector = columns[i];
             std::string flags = rowValues[i];
 
-            if (flags == "Not present" || flags == "No available") {
+            // Handle "Not present" and "Not Available" flags.
+            if (flags == "Not present") {
+                // Always treat "Not present" as bad.
                 skippedDetectors.insert(detector);
+                continue;
+            } else if (flags == "Not Available") {
+                // For "Not Available", check the option.
+                if (!treatNotAvailableAsGood) {
+                    skippedDetectors.insert(detector);
+                }
                 continue;
             }
 
@@ -179,11 +190,13 @@ void process_and_upload(const char* csvFilePath,
                     }
                 }
             }
-            // For skipped detectors, mark them as "Bad".
-            for (const auto& detector : skippedDetectors) {
-                if (detailedBitMapping[detector].count("Bad")) {
-                    int bit = detailedBitMapping[detector]["Bad"];
-                    encodedWord |= (1 << bit);
+            // For detectors that were skipped, mark them as "Bad" unless treatNotAvailableAsGood is true.
+            if (!treatNotAvailableAsGood) {
+                for (const auto& detector : skippedDetectors) {
+                    if (detailedBitMapping[detector].count("Bad")) {
+                        int bit = detailedBitMapping[detector]["Bad"];
+                        encodedWord |= (1 << bit);
+                    }
                 }
             }
             encodedFlags[fromTimestamp] = encodedWord;

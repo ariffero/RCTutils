@@ -136,9 +136,15 @@ g++ -shared -fPIC dict_ccdb.cxx -o dict_ccdb.so $(root-config --cflags --libs)
 - A CSV file containing RCT flags for various detectors. The file can be created following [this instruction](https://github.com/JianLIUhep/RCTutils/tree/main?tab=readme-ov-file#export-runs-from-rct-in-bookkeeping).
 
 #### Command:
+Treat "Not available" as Bad:
 ```
 root -b -q 'process_and_upload.C("path/to/input.csv", "passName", "periodName", "versionNumber",  "YourCCDBPath")'
 ```
+Treat "Not available" as Good:
+```
+root -b -q 'process_and_upload.C("path/to/input.csv", "passName", "periodName", "versionNumber",  "YourCCDBPath", true)'
+```
+
 ### 2. Reading Encoded Flags from CCDB
 
 #### Input:
