@@ -27,37 +27,51 @@ def fetch_runs(api_base_url, data_pass_id, token):
     return runs
 
 def fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, token):
-    """Fetches quality flags for a specific detector and run."""
+    """
+    Fetches and filters detector flags with valid effective periods.
+    """
     url = f"{flag_api_url}?dataPassId={data_pass_id}&runNumber={run_number}&dplDetectorId={detector_id}&token={token}"
     response = requests.get(url, verify=False)
-    data = response.json()
-    flags = data.get('data', [])
     
+    flags = response.json().get('data', [])
     if not flags:
         return ["Not Available"]
 
-    # Sort flags by 'updatedAt' timestamp
-    flags.sort(key=lambda x: x['updatedAt'])
+    return [flag for flag in flags if flag.get("effectivePeriods")]
 
-    intervals = {}
-    for flag in flags:
-        key = (flag['from'], flag['to'])
-        intervals[key] = flag  # Keep only the latest flag for each interval
-
-    return list(intervals.values())
-
-def format_flags(flags):
-    """Formats the flags for CSV output."""
+def format_flags(flags, convert_time=False):
     if flags == ["Not Available"]:
         return "Not Available"
-    if len(flags) == 1:
-        return flags[0]['flagType']['method']
+    if flags == ["Not Present"]:
+        return "Not Present"
+    
+    # Ensure flags is a list of dictionaries
+    if isinstance(flags, str):
+        try:
+            flags = json.loads(flags)
+        except json.JSONDecodeError:
+            raise ValueError("Invalid format: flags must be a list of dictionaries or a valid JSON string.")
+    
+    # Ensure all elements in flags are dictionaries
+    if not isinstance(flags, list) or not all(isinstance(flag, dict) for flag in flags):
+        raise ValueError("Invalid format: flags must be a list of dictionaries.")
+
+    # Format flags
     formatted_flags = []
     for flag in flags:
-        formatted_flags.append(f"{flag['flagType']['method']} (from: {datetime.utcfromtimestamp(flag['from'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}, to: {datetime.utcfromtimestamp(flag['to'] / 1000).strftime('%Y-%m-%d %H:%M:%S')})")
+        for period in flag["effectivePeriods"]:
+            if convert_time:
+                # Convert timestamps to human-readable datetime
+                from_time = datetime.utcfromtimestamp(period["from"] / 1000).strftime('%Y-%m-%d %H:%M:%S')
+                to_time = datetime.utcfromtimestamp(period["to"] / 1000).strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                # Keep raw timestamps
+                from_time = period["from"]
+                to_time = period["to"]
+            formatted_flags.append(f"{flag['flagType']['method']} (from: {from_time} to: {to_time})")
     return " | ".join(formatted_flags)
 
-def main(config_file):
+def main(config_file, convert_time):
     # Load configuration from the specified JSON file
     with open(config_file, 'r') as file:
         config = json.load(file)
@@ -113,7 +127,7 @@ def main(config_file):
                         row.append("Not present")
                     else:
                         flags = fetch_detector_flags(flag_api_url, data_pass_id, run_number, detector_id, token)
-                        row.append(format_flags(flags))
+                        row.append(format_flags(flags, convert_time=convert_time))
                 
                 writer.writerow(row)
     
@@ -122,6 +136,8 @@ def main(config_file):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetch run and detector data based on configuration.")
     parser.add_argument("config_file", help="Path to the JSON configuration file")
+    parser.add_argument("--convert-time", action="store_true", help="Convert timestamps to human-readable datetime")
+
     args = parser.parse_args()
-    main(args.config_file)
+    main(args.config_file, args.convert_time)
 
